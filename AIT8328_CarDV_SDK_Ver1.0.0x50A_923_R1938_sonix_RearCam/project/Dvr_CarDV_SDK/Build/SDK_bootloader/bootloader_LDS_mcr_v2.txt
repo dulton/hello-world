@@ -1,0 +1,39 @@
+; SRAM 0x0011E000 ~ 0x001D0000 832KB
+
+ALL_DRAM    0x00128000  0x000A8000
+{
+    ALL_DRAM    0x00128000  0x000A4000
+    {
+        cstartup*.o         (reset,+FIRST)
+        .ANY                (+RO,+RW,+ZI)
+    }
+
+    ITCM_EXE	0x00000000  0x00002000      ; ITCM 8KB
+    {
+        cstartup*.o         (+RO,+RW)
+        bsp*.o              (+RO,+RW)
+        ;mmpf_pll.o          (PLLAsync)
+        ;mmpf_mci.o          (MCIdepth)
+        mmpf_dram.o         (RESETMCI)
+    }
+
+    DTCM_BOOT   0x00080000  0x00000020      ; DTCM 32-byte
+    {
+        ; for booting parameters
+        .ANY                (dummy)
+    }
+
+    DTCM_ZI     0x00080020  0x00001FE0      ; DTCM 8KB - 32B
+    {
+        .ANY                (+ZI)
+        ;mmpf_pll.o         (SwitchClkData)
+    }
+}
+
+TCM_END 0x00082000   0x0
+{
+    TCM_END +0
+    {
+        .ANY                (dummy)
+    }
+}

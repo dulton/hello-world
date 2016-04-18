@@ -1,0 +1,330 @@
+//*----------------------------------------------------------------------------
+//* The software is delivered "AS IS" without warranty or condition of any
+//* kind, either express, implied or statutory. This includes without
+//* limitation any warranty or condition with respect to merchantability or
+//* fitness for any particular purpose, or against the infringements of
+//* intellectual property rights of others.
+//*----------------------------------------------------------------------------
+//* File Name           : audio_p_fw.c32
+//* Object              : Config System Software Environment by Firmware Type
+//* Creation            : Philip Lin at 2008/7/2 17:53
+//*
+//*----------------------------------------------------------------------------
+
+#include "All_fw.h" 
+#include "includes_fw.h"
+#include "lib_retina.h"
+#include "customer_config.h"
+
+//==============================================================================
+//
+//                              EXTERN VARIABLES
+//
+//==============================================================================
+
+extern OS_STK           DSC_Task_Stk[];
+#if (DSC_R_EN)
+extern OS_STK           DSC_Stream_Task_Stk[];
+extern OS_STK           JPEG_Ctl_Task_Stk[];
+#endif
+extern OS_STK           SENSOR_Task_Stk[];
+extern OS_STK           AUDIO_Record_Task_Stk[];
+extern OS_STK           AUDIO_Play_Task_Stk[];
+#if ((AUDIO_P_EN)&&((AUDIO_STREAMING_EN)||(AUI_STREAMING_EN)))||(AUDIO_R_EN)
+extern OS_STK           AUDIO_WriteFile_Task_Stk[];
+#endif
+extern OS_STK           FDTC_Task_Stk[];
+extern OS_STK           USB_Task_Stk[];
+#if (MSDC_WR_FLOW_TEST_EN == 1)
+extern OS_STK           USB_Write_Task_Stk[];
+#endif
+#if (SUPPORT_USB_HOST_FUNC)
+extern OS_STK           USBH_PostProcess_Task_Stk[];
+extern OS_STK           USBH_BulkIn_Task_Stk[];
+#endif
+
+extern OS_STK           VIDPLAY_Task_Stk[];
+extern OS_STK           PARSR3GP_Task_Stk[];
+extern OS_STK           VIDDEC_Task_Stk[];
+extern OS_STK           MP4VENC_Task_Stk[];
+extern OS_STK           MERGR3GP_Task_Stk[];
+extern OS_STK           FS_Task_Stk[];
+#if (HANDLE_EVENT_BY_TASK == 1)
+extern OS_STK           EVENT_Task_Stk[];
+#endif
+
+#if defined(ALL_FW) && (SUPPORT_EIS)
+OS_STK  GYROStack[TASK_GYRO_STK_SIZE];
+OS_STK  EISStack[TASK_EIS_STK_SIZE];
+extern void GYRO_TaskHandler(void *p_arg);
+extern void EIS_TaskHandler(void *p_arg);
+#endif
+
+//==============================================================================
+//
+//                              FUNCTIONS
+//
+//==============================================================================
+
+#ifdef BUILD_CE
+OS_STK  JOB_DISPATCH_Task_Stk[TASK_JOB_DISPATCH_STK_SIZE];
+OS_STK  SYS_High_Stk[TASK_HIGH_STK_SIZE];
+OS_STK  SYS_High_Work_Stk[TASK_HIGH_WORK_STK_SIZE];
+
+//------------------------------------------------------------------------------
+//  Function    : CE_JOB_DISPATCH_Task_Entry
+//  Description : Task entry function for FS function
+//------------------------------------------------------------------------------
+void CE_JOB_DISPATCH_Task(void *p_arg);
+
+void CE_JOB_DISPATCH_TaskHandler(void *p_arg)
+{
+    CE_JOB_DISPATCH_Task(p_arg);
+}
+#endif
+
+#ifdef ALL_FW
+
+#ifndef TASK_AHC_STK_SIZE
+#define TASK_AHC_STK_SIZE		(4096)
+#endif
+
+OS_STK  AhcStack[TASK_AHC_STK_SIZE];
+extern  void AHC_Main_Task(void *p_arg);
+//------------------------------------------------------------------------------
+//  Function    : AhcTask
+//  Description :
+//------------------------------------------------------------------------------
+void AhcTask(void *p_arg) 
+{
+    AHC_Main_Task(p_arg);
+}
+#endif
+
+extern unsigned int Image$$ALL_DRAM$$ZI$$Limit;
+extern unsigned int *pCurCoarsePageTableAddr;
+extern unsigned char pCoarsePageUsage;
+
+/** @addtogroup BSP
+@{
+*/
+
+//*----------------------------------------------------------------------------
+//* \fn    MMPF_SWPACK_TaskInit
+//* \brief Application specific MMU configurations for SRAM and DRAM
+//*----------------------------------------------------------------------------
+void MMPF_SWPACK_TaskInit()
+{
+    MMPF_TASK_CFG   task_cfg;
+
+    MMPF_MMU_Initialize((MMP_ULONG *)MMU_TRANSLATION_TABLE_ADDR,(MMP_ULONG *)MMU_COARSEPAGE_TABLE_ADDR);
+
+    #if defined(ALL_FW)
+    {
+        extern void do_pre_smp_initcalls(void);
+        do_pre_smp_initcalls();
+    }
+    #endif
+    
+    task_cfg.ubPriority = TASK_HIGH_PRIO;
+    task_cfg.pbos = (MMP_ULONG)&SYS_High_Stk[0];
+    task_cfg.ptos = (MMP_ULONG)&SYS_High_Stk[TASK_HIGH_STK_SIZE-1];
+    MMPF_OS_CreateTask(MMPF_HIGH_TaskHandler, &task_cfg, (void *)0);
+    MMPF_OS_SetTaskName(task_cfg.ubPriority, (INT8U *)"HIGH");
+
+    task_cfg.ubPriority = TASK_HIGH_WORK_PRIO;
+    task_cfg.pbos = (MMP_ULONG)&SYS_High_Work_Stk[0];
+    task_cfg.ptos = (MMP_ULONG)&SYS_High_Work_Stk[TASK_HIGH_WORK_STK_SIZE-1];
+    MMPF_OS_CreateTask(MMPF_HIGH_WorkTaskHandler, &task_cfg, (void *)0);
+    MMPF_OS_SetTaskName(task_cfg.ubPriority, (INT8U *)"HIGHWork");
+    
+    #if (VIDEO_R_EN)
+    task_cfg.ubPriority = TASK_3GPMERGR_PRIO;
+    task_cfg.pbos = (MMP_ULONG)&MERGR3GP_Task_Stk[0];
+    task_cfg.ptos = (MMP_ULONG)&MERGR3GP_Task_Stk[MERGR3GP_STK_SIZE-1];
+    MMPF_OS_CreateTask(MMPF_3GPMERGR_TaskHandler, &task_cfg, (void *)0);
+    MMPF_OS_SetTaskName(task_cfg.ubPriority, (INT8U *)"3GPMERGR");
+    #endif
+
+    #if (AUDIO_R_EN)||(VIDEO_R_EN)
+    task_cfg.ubPriority = TASK_AUDIO_RECORD_PRIO;
+    task_cfg.pbos = (INT32U)&AUDIO_Record_Task_Stk[0];
+    task_cfg.ptos = (INT32U)&AUDIO_Record_Task_Stk[AUDIO_RECORD_STK_SIZE-1];
+    MMPF_OS_CreateTask(MMPF_AUDIORECORD_TaskHandler, &task_cfg, (void *)0);
+    MMPF_OS_SetTaskName(task_cfg.ubPriority, (INT8U *)"AUDIORECORD");
+    #endif
+
+    #if (AUDIO_P_EN)||(VIDEO_P_EN)
+    task_cfg.ubPriority = TASK_AUDIO_PLAY_PRIO;
+    task_cfg.pbos = (INT32U)&AUDIO_Play_Task_Stk[0];
+    task_cfg.ptos = (INT32U)&AUDIO_Play_Task_Stk[AUDIO_PLAY_STK_SIZE-1];
+    MMPF_OS_CreateTask(MMPF_AUDIOPLAY_TaskHandler, &task_cfg, (void *)0);
+    MMPF_OS_SetTaskName(task_cfg.ubPriority, (INT8U *)"AUDIOPLAY");
+    #endif
+
+    #if (VIDEO_P_EN)
+    task_cfg.ubPriority = TASK_3GPPARSR_PRIO;
+    task_cfg.pbos = (MMP_ULONG)&PARSR3GP_Task_Stk[0];
+    task_cfg.ptos = (MMP_ULONG)&PARSR3GP_Task_Stk[DEMUXER_STK_SIZE-1];
+    MMPF_OS_CreateTask(MMPF_3GPPARSR_TaskHandler, &task_cfg, (void *)0);
+    MMPF_OS_SetTaskName(task_cfg.ubPriority, (INT8U *)"3GPPARSR");
+
+    task_cfg.ubPriority = TASK_VIDDEC_PRIO;
+    task_cfg.pbos = (MMP_ULONG)&VIDDEC_Task_Stk[0];
+    task_cfg.ptos = (MMP_ULONG)&VIDDEC_Task_Stk[DECODER_STK_SIZE-1];
+    MMPF_OS_CreateTask(MMPF_VIDDEC_TaskHandler, &task_cfg, (void *)0);
+    MMPF_OS_SetTaskName(task_cfg.ubPriority, (INT8U *)"VIDDEC");
+
+    task_cfg.ubPriority = TASK_VIDPLAY_PRIO;
+    task_cfg.pbos = (MMP_ULONG)&VIDPLAY_Task_Stk[0];
+    task_cfg.ptos = (MMP_ULONG)&VIDPLAY_Task_Stk[PLAYER_STK_SIZE-1];
+    MMPF_OS_CreateTask(MMPF_VIDPLAY_TaskHandler, &task_cfg, (void *)0);
+    MMPF_OS_SetTaskName(task_cfg.ubPriority, (INT8U *)"VIDPLAY");
+    
+    #if (VIDEO_BGPARSER_EN == 1)
+    task_cfg.ubPriority = TASK_BG_PARSER_PRIO;
+    task_cfg.pbos = (MMP_ULONG)&BG_PARSER_Task_Stk[0];
+    task_cfg.ptos = (MMP_ULONG)&BG_PARSER_Task_Stk[TASK_BG_PARSER_STK_SIZE-1];
+    MMPF_OS_CreateTask(MMPF_VIDPSR_BGTaskHandler, &task_cfg, (void *)0);
+    MMPF_OS_SetTaskName(task_cfg.ubPriority, (INT8U *)"VIDPSR_BG");
+    
+    #if (VIDEO_HIGHPRIORITY_FS == 1)
+    task_cfg.ubPriority = TASK_HIGHFS_PRIO;
+    task_cfg.pbos = (MMP_ULONG)&HIGH_PRIO_FS_Task_Stk[0];
+    task_cfg.ptos = (MMP_ULONG)&HIGH_PRIO_FS_Task_Stk[HIGH_PRIO_FS_STK_SIZE-1];
+    MMPF_OS_CreateTask(MMPF_VIDPSR_BGFSTaskHandler, &task_cfg, (void *)0);
+    MMPF_OS_SetTaskName(task_cfg.ubPriority, (INT8U *)"VIDPSR_BGFS");
+    #endif
+    #endif
+    #endif 
+
+    #if (DSC_R_EN)||(DSC_P_EN)
+    task_cfg.ubPriority = TASK_DSC_PRIO;
+    task_cfg.pbos = (MMP_ULONG)&DSC_Task_Stk[0];
+    task_cfg.ptos = (MMP_ULONG)&DSC_Task_Stk[TASK_DSC_STK_SIZE-1];
+    MMPF_OS_CreateTask(MMPF_DSC_TaskHandler, &task_cfg, (void *)0);
+    MMPF_OS_SetTaskName(task_cfg.ubPriority, (INT8U *)"DSC");
+	
+	#if (DSC_R_EN)
+    task_cfg.ubPriority = TASK_DSC_STREAM_PRIO;
+    task_cfg.pbos = (MMP_ULONG)&DSC_Stream_Task_Stk[0];
+    task_cfg.ptos = (MMP_ULONG)&DSC_Stream_Task_Stk[TASK_DSC_STREAM_STK_SIZE-1];
+    MMPF_OS_CreateTask(MMPF_DSC_Stream_TaskHandler, &task_cfg, (void *)0);
+    MMPF_OS_SetTaskName(task_cfg.ubPriority, (INT8U *)"DSCStream");
+
+    task_cfg.ubPriority = TASK_JPEG_CTL_PRIO;
+    task_cfg.pbos = (MMP_ULONG)&JPEG_Ctl_Task_Stk[0];
+    task_cfg.ptos = (MMP_ULONG)&JPEG_Ctl_Task_Stk[TASK_JPEG_CTL_STK_SIZE-1];
+    MMPF_OS_CreateTask(MMPF_JPEG_Ctl_TaskHandler, &task_cfg, (void *)0);
+    MMPF_OS_SetTaskName(task_cfg.ubPriority, (INT8U *)"JpegCtl");
+    #endif
+    #endif
+
+    #if (SENSOR_EN)
+    task_cfg.ubPriority = TASK_SENSOR_PRIO;
+    task_cfg.pbos = (MMP_ULONG)&SENSOR_Task_Stk[0];
+    task_cfg.ptos = (MMP_ULONG)&SENSOR_Task_Stk[TASK_SENSOR_STK_SIZE-1];
+    MMPF_OS_CreateTask(MMPF_SENSOR_TaskHandler, &task_cfg, (void *)0);
+    MMPF_OS_SetTaskName(task_cfg.ubPriority, (INT8U *)"SENSOR");
+    
+    #if ((DSC_R_EN)||(VIDEO_R_EN))&&((SUPPORT_FDTC)||(SUPPORT_MDTC))
+    task_cfg.ubPriority = TASK_FDTC_PRIO;
+    task_cfg.pbos = (MMP_ULONG)&FDTC_Task_Stk[0];
+    task_cfg.ptos = (MMP_ULONG)&FDTC_Task_Stk[TASK_FDTC_STK_SIZE-1];
+    MMPF_OS_CreateTask(MMPF_FDTC_TaskHandler, &task_cfg, (void *)0);
+    MMPF_OS_SetTaskName(task_cfg.ubPriority, (INT8U *)"FDTC");
+    #endif
+    #endif
+
+    #if (VIDEO_R_EN)
+    task_cfg.ubPriority = TASK_MP4VENC_PRIO;
+    task_cfg.pbos = (MMP_ULONG)&MP4VENC_Task_Stk[0];
+    task_cfg.ptos = (MMP_ULONG)&MP4VENC_Task_Stk[MP4VENC_STK_SIZE-1];
+    MMPF_OS_CreateTask(MMPF_MP4VENC_TaskHandler, &task_cfg, (void *)0);
+    MMPF_OS_SetTaskName(task_cfg.ubPriority, (INT8U *)"MP4VENC");
+    #endif
+    
+    #if (USB_EN)
+    task_cfg.ubPriority = TASK_USB_PRIO;
+    task_cfg.pbos = (INT32U)&USB_Task_Stk[0];
+    task_cfg.ptos = (INT32U)&USB_Task_Stk[USB_STK_SIZE-1];
+    MMPF_OS_CreateTask(MMPF_USB_TaskHandler, &task_cfg, (void *)0);
+    MMPF_OS_SetTaskName(task_cfg.ubPriority, (INT8U *)"USB");
+    
+    #if (MSDC_WR_FLOW_TEST_EN == 1)
+    task_cfg.ubPriority = TASK_USB_WRITE_PRIO;
+    task_cfg.pbos = (INT32U)&USB_Write_Task_Stk[0];
+    task_cfg.ptos = (INT32U)&USB_Write_Task_Stk[USB_STK_SIZE-1];
+    MMPF_OS_CreateTask(MMPF_USB_WriteTaskHandler, &task_cfg, (void *)0);
+    MMPF_OS_SetTaskName(task_cfg.ubPriority, (INT8U *)"USB_Write");
+    #endif
+   
+    #if (SUPPORT_USB_HOST_FUNC)
+    task_cfg.ubPriority = TASK_USBH_POSTPROCESS_PRIO;
+    task_cfg.pbos = (INT32U)&USBH_PostProcess_Task_Stk[0];
+    task_cfg.ptos = (INT32U)&USBH_PostProcess_Task_Stk[USB_UVCH_POSTPROC_STK_SIZE-1];
+    MMPF_OS_CreateTask(MMPF_USB_UVCH_PostProcess_TaskHandler, &task_cfg, (void *)0);
+    MMPF_OS_SetTaskName(task_cfg.ubPriority, (INT8U *)"USB_UVCH");
+
+    task_cfg.ubPriority = TASK_USBH_BULKIN_PRIO;
+    task_cfg.pbos = (INT32U)&USBH_BulkIn_Task_Stk[0];
+    task_cfg.ptos = (INT32U)&USBH_BulkIn_Task_Stk[USB_UVCH_BULKIN_STK_SIZE-1];
+    MMPF_OS_CreateTask(MMPF_USB_UVCH_BulkIn_TaskHandler, &task_cfg, (void *)0);
+    MMPF_OS_SetTaskName(task_cfg.ubPriority, (INT8U *)"UVCH_BulkIn");
+    #endif
+    #endif
+
+    #if ((AUDIO_P_EN)&&((AUDIO_STREAMING_EN)||(AUI_STREAMING_EN)))||(AUDIO_R_EN)
+    task_cfg.ubPriority = TASK_AUDIO_STREAM_PRIO;
+    task_cfg.pbos = (INT32U)&AUDIO_WriteFile_Task_Stk[0];
+    task_cfg.ptos = (INT32U)&AUDIO_WriteFile_Task_Stk[AUDIO_WRITEFILE_STK_SIZE-1];
+    MMPF_OS_CreateTask(MMPF_AUDIOSTREAMING_TaskHandler, &task_cfg, (void *)0);
+    MMPF_OS_SetTaskName(task_cfg.ubPriority, (INT8U *)"AUDIOSTREAMING");
+    #endif
+
+    #if (!defined(MBOOT_FW) || defined(FAT_BOOT)||defined(MBOOT_EX_FW)) 
+    task_cfg.ubPriority = TASK_FS_PRIO;
+    task_cfg.pbos = (INT32U)&FS_Task_Stk[0];
+    task_cfg.ptos = (INT32U)&FS_Task_Stk[FS_STK_SIZE-1];
+    MMPF_OS_CreateTask(MMPF_FS_TaskHandler, &task_cfg, (void *)0);
+    MMPF_OS_SetTaskName(task_cfg.ubPriority, (INT8U *)"FS");
+    #endif
+
+    #if !defined(MBOOT_FW)&&(HANDLE_EVENT_BY_TASK == 1)
+    task_cfg.ubPriority = TASK_EVENT_PRIO;
+    task_cfg.pbos = (INT32U)&EVENT_Task_Stk[0];
+    task_cfg.ptos = (INT32U)&EVENT_Task_Stk[EVENT_STK_SIZE-1];
+    MMPF_OS_CreateTask(MMPF_EVENT_TaskHandler, &task_cfg, (void *)0);
+    MMPF_OS_SetTaskName(task_cfg.ubPriority, (INT8U *)"EVENT");
+    #endif
+
+    task_cfg.ubPriority = TASK_JOB_DISPATCH_PRIO;
+    task_cfg.pbos = (MMP_ULONG)&JOB_DISPATCH_Task_Stk[0];
+    task_cfg.ptos = (MMP_ULONG)&JOB_DISPATCH_Task_Stk[TASK_JOB_DISPATCH_STK_SIZE-1];
+    MMPF_OS_CreateTask(CE_JOB_DISPATCH_TaskHandler, &task_cfg, (void *)"JOB");
+    MMPF_OS_SetTaskName(task_cfg.ubPriority, (INT8U *)"JOB_DISPATCH");
+
+    #if defined(ALL_FW) && (SUPPORT_EIS)
+    task_cfg.ubPriority = TASK_GYRO_PRIO;
+    task_cfg.pbos = (MMP_ULONG)&GYROStack[0];
+    task_cfg.ptos = (MMP_ULONG)&GYROStack[TASK_GYRO_STK_SIZE-1];
+    MMPF_OS_CreateTask(GYRO_TaskHandler, &task_cfg, (void *)"Gyro");
+    MMPF_OS_SetTaskName(task_cfg.ubPriority, (INT8U *)"GYRO");
+
+    task_cfg.ubPriority = TASK_EIS_PRIO;
+    task_cfg.pbos = (MMP_ULONG)&EISStack[0];
+    task_cfg.ptos = (MMP_ULONG)&EISStack[TASK_EIS_STK_SIZE-1];
+    MMPF_OS_CreateTask(EIS_TaskHandler, &task_cfg, (void *)"EIS"); 
+    MMPF_OS_SetTaskName(task_cfg.ubPriority, (INT8U *)"EIS");
+    #endif
+
+    #ifdef ALL_FW //CarDV...	
+    task_cfg.ubPriority = TASK_AHC_INIT_PRIO;
+    task_cfg.pbos = (MMP_ULONG)&AhcStack[0];
+    task_cfg.ptos = (MMP_ULONG)&AhcStack[TASK_AHC_STK_SIZE-1];
+    MMPF_OS_CreateTask(AhcTask, &task_cfg, (void *)"Ahc");
+    MMPF_OS_SetTaskName(task_cfg.ubPriority, (INT8U *)"AhcTask");
+    #endif
+
+}
+/** @} */ /* End of BSP */

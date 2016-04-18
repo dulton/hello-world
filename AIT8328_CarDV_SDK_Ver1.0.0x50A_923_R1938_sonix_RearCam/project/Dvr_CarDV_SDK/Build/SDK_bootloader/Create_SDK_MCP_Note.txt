@@ -1,0 +1,15 @@
+Create SDK MCP:
+- Copy bootloader.mcp from bootloader
+- Sync LD settinfs from bootloader
+
+- SDK_bootloader\bootloader.mcp (MCR_V2 / MCR_V2_32MB Target)
+  de-select
+  \core\src\common
+  \core\src\drv\sys
+ 
+  re-select
+  \core\src\common\bsp\cstartup_ram.s
+
+  add LIB files
+  \core\lib\bootloader.a (MCR_V2 / MCR_V2_32MB)
+  \core\lib\bootloader_FAT.a (MCR_V2_FAT)

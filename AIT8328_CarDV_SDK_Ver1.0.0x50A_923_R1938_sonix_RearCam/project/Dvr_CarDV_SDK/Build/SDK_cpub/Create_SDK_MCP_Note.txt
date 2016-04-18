@@ -1,0 +1,17 @@
+Create SDK MCP:
+- Copy source files from cpub folder
+
+- SDK_cpub\AIT8428CPUB.mcp
+  remove \core\src\common
+  but keep
+  \core\src\common\bsp\cstartup_ram.s
+  \core\src\common\bsp\vector.s
+  
+  remove \core\src\dvr
+  but keep
+  \core\src\dvr\sys\multicore\mmpf_score.c
+  
+  add LIB files
+  \core\lib\cpub.a 
+
+  

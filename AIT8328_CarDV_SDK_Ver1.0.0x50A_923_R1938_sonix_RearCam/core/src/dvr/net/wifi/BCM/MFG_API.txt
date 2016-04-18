@@ -1,0 +1,29 @@
+1. 11b TX test
+	wlan_mfg_tx_bg(ch, WLM_RATE_11M, txpwr)
+	- ch: channel number
+	- txpwr: -1 means default power or value in mili dBm (15000 for 15dBm)
+	
+2. 11g TX test
+	wlan_mfg_tx_bg(ch, WLM_RATE_54M, txpwr)
+	- ch: channel number
+	- txpwr: -1 means default power or value in mili dBm (15000 for 15dBm)
+	
+3. 11n TX test
+	wlan_mfg_tx_n(ch, WLM_MCS_RATE_7, txpwr)
+	- ch: channel number
+	txpwr: -1 means default power or value in mili dBm (15000 for 15dBm)
+	
+4. RX test
+	wlan_mfg_rx(ch)
+	- ch: channel number
+	
+5. Get received packets
+	wlan_mfg_rx_getpkt(&count)
+	- count: received packet count
+	
+6. Non-modulation TX test
+	wlan_mfg_carrier_tone(ch)
+	- ch; channel number
+
+7. Stop MFG test
+	wlan_mfg_stop()

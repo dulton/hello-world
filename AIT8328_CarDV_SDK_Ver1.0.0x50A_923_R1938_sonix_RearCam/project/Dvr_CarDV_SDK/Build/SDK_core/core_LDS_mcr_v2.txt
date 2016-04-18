@@ -1,0 +1,100 @@
+; 2MB, using only 1MB
+ALL_DRAM    0x01000000  0x02000000
+{
+    RESET       0x01000000  0x000000F8
+    {
+    	 cstartup*.o         (reset, +FIRST)
+    }
+
+    CPU_B_FW    +0x0
+    {
+        *.o             (CPUB_FW)
+    }
+
+	CPU_COMM_MODULE_INIT    +0x0
+    {
+		*.o             (CpuCommModuleInit)
+    }
+
+	CPU_COMM_MODULE_EXIT    +0x0
+    {
+		*.o             (CpuCommModuleExit)
+    }
+    
+    NETNODE_INIT    +0x0
+    {
+    	amnss_ucos.o		(netnode_init, +FIRST)
+        *.o					(netnode_init)
+    }
+    
+    NETCGI_INIT     +0x0
+    {
+    	cgi_main.o			(netcgi_init, +FIRST)
+        *.o			 		(netcgi_init)
+    }
+    
+    MODULE_INIT     +0x0
+    {
+        *.o  (initcall1)
+        *.o  (initcall2)
+        *.o  (initcall3)
+        *.o  (initcall4)
+        *.o  (initcall5)
+        *.o  (initcall6)
+        *.o  (initcall7)                                                             
+    }
+
+    ALL_DRAM_RO +0x0
+    {
+        .ANY            (+RO)
+    }
+
+    ALL_DRAM_RW +0x0
+    {
+        .ANY            (+RW)
+    }
+
+    ALL_DRAM +0x0
+    {
+        .ANY            (+ZI)
+    }
+
+    ITCM_EXE    0x00000000  0x00001000
+	{
+	    vector.o            (vector, +FIRST)
+	    cstartup*.o         (+RO,+RW)
+	    bsp*.o              (+RO,+RW)
+		;mmpf_pll.o          (PLLAsync)
+		mmpf_dram.o         (EnterSelfSleepMode)
+		mmpf_system.o       (EnterSelfSleepMode)
+	}
+	
+    DTCM_BOOT   0x00080000  0x00000020  ; DTCM 32-byte
+    {
+        ; for booting parameters
+        .ANY                (dummy)
+    }
+
+	DTCM_EXE    0x00080020  0x0000FE0
+    {
+         ;mmpf_pll.o         (ChangePLL_DTCM)
+         bsp*.o             (+ZI)
+    }
+    
+    ; 0x00100000 ~ 0x00104000 reserved for CPU_A MMU table
+    ; 0x00104000 ~ 0x00108000 reserved for CPU_B MMU table
+    ; SRAM size 832KB, last 584KB shared by LDC & H.264
+    ALL_SRAM    0x00108000  0x00000100
+    {
+        .ANY                (dummy)
+    }
+}
+
+; (DUMMY)
+TCM_END 0x00082000   0x0
+{
+    TCM_END +0
+    {
+        .ANY                (dummy)
+    }
+}

@@ -1,0 +1,49 @@
+<?chp
+ // the list of values and labels for the checkboxes
+ char *personality_attributes_value[] = { "perky", "morose", "thinking", "feeling", "thrifty", "prodigal" };
+ char *personality_attributes_label[] = { "Perky", "Morose", "Thinking", "Feeling", "Spend-thrift", "Shopper" };
+?>
+
+<html>
+<head><title>Personality</title></head>
+<body>
+  
+<?chp
+ // create HTML for identically-named checkboxes
+ // in CHP, we can't define function within another function ==> Use #define macro as a replace
+#define make_checkboxes(name) do {\
+	int i; \
+	for (i=0; i<6; i++) { \
+		CHP_PRINTF("%s <input type='checkbox' name='%s[]' value='%s' ", \
+				personality_attributes_label[i], name, personality_attributes_value[i]); \
+		if ( CHP_IN_ARRAY( personality_attributes_value[i], "attributes[]" ) ) CHP_PRINTF("checked "); \
+		CHP_PRINTF("/><br />\n"); \
+	} \
+} while (0)
+  
+?>
+  
+<form action="<?chp CHP_PRINTF("%s", CHP_SERVER_SELF); ?>" method="GET">
+Select your personality attributes:<br />
+<?chp make_checkboxes("attributes"); ?>
+<br />
+<input type="submit" name="s" value="Record my personality!" />
+</form>
+
+<?chp
+	if (CHP_GET_VARS("s") != NULL) {
+		int  i;
+		char *str;
+
+		CHP_PRINTF("You have a ");
+		for (i=0; i<100; i++) {
+			str = CHP_GET_ARRAYS("attributes[]",i);
+			if (!str) break;
+			CHP_PRINTF("%s ", str);
+		}
+		CHP_PRINTF("personality.");
+	}
+?>
+
+</body>
+</html>

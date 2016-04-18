@@ -1,0 +1,31 @@
+Create SDK MCP:
+- Copy core.mcp from core
+- Sync LD settings from core
+
+- SDK_core\core.mcp (MCR_V2 / MCR_V2_32MB Target)
+  de-select
+  \core\src\common
+  \core\src\utility
+  \core\src\drv\version.c
+  \core\src\drv\sys
+  \core\src\drv\driver
+  \core\lib\algorithm\fdtc\fdtc.a
+  \core\lib\algorithm\sbc_enc\sbclib.a
+  
+  remove
+  \core\src\drv\net
+  
+  re-select
+  \core\src\common\bsp\cstartup_ram.s
+  \core\src\common\bsp\vector.s
+  \core\src\common\module\cpucomm\mmpf_cpu.c (for 2nd CPU)
+  
+  add LIB files
+  \core\lib\core.a (MCR_V2)
+  \core\lib\core_net.a (MCR_V2)
+  \core\lib\core_32MB.a (MCR_V2_32MB)
+  \core\lib\net (MCR_V2)
+  \core\lib\netobj (MCR_V2)
+  \core\lib\net\wifi\gb9662.a (MCR_V2)
+
+  

@@ -1,0 +1,104 @@
+<?chp
+	struct osal_dirent_t *dent;
+	OSAL_DIR *dp;
+	char pathbuf[128];
+	char *sep = CHP_GET_CONFIG("Sys.Dir.SEP");
+	char *WebRoot = CHP_GET_CONFIG("Sys.Dir.WWW");
+	char *currDir = CHP_GET_VARS("directory");
+	if (currDir == NULL)
+		currDir = CHP_GET_CONFIG("Sys.Dir.Recording");
+?>
+
+<!-- =================================================================================== -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<!-- =================================================================================== -->
+
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<style type="text/css">
+	body {background-color: #ffffff; color: #000000;}
+	body, td, th, h1, h2 {font-family: sans-serif;}
+	pre {margin: 0px; font-family: monospace;}
+	a:link {color: #000099; text-decoration: none; background-color: #ffffff;}
+	a:hover {text-decoration: underline;}
+	table {border-collapse: collapse;}
+	.center {text-align: center;}
+	.center table { margin-left: auto; margin-right: auto; text-align: left;}
+	.center th { text-align: center !important; }
+	td, th { border: 1px solid #000000; font-size: 75%; vertical-align: baseline;}
+	h1 {font-size: 150%;}
+	h2 {font-size: 125%;}
+	.p {text-align: left;}
+	.e {background-color: #ccccff; font-weight: bold; color: #000000;}
+	.h {background-color: #9999cc; font-weight: bold; color: #000000;}
+	.v {background-color: #cccccc; color: #000000;}
+	.vr {background-color: #cccccc; text-align: right; color: #000000;}
+	img {float: right; border: 0px;}
+	hr {width: 800px; background-color: #cccccc; border: 0px; height: 1px; color: #000000;}
+</style>
+<title>Index of <?chp CHP_PRINTF("%s", currDir); ?> </title>
+<meta name="ROBOTS" content="NOINDEX,NOFOLLOW,NOARCHIVE" />
+</head>
+
+<!-- =================================================================================== -->
+<body>
+<div class="center">
+<br />
+<h1>Index of <?chp CHP_PRINTF("%s", currDir); ?> </h1>
+<hr />
+<br />
+<table border="0" cellpadding="3" width="600">
+  <tbody>
+    <tr class="h">
+      <th>Name</th>
+      <th>Last modified</th>
+      <th>Size</th>
+    </tr>
+
+
+<?chp
+	//---------------------------------------------------------------------------------
+	sprintf( pathbuf, "%s%s%s", WebRoot, sep, currDir );
+	dp = osal_opendir( pathbuf );
+	if (dp) {
+		while (1) {
+			dent = osal_readdir(dp);
+			if (!dent) break;
+			if (!strcmp(dent->d_name, ".") || !strcmp(dent->d_name, ".."))
+				continue;
+
+			if (dent->d_type & DT_DIR)
+				CHP_PRINTF("<tr> <td class='e'>  <a href='%s?directory=%s/%s'> >>> %s >>> </a> </td>",
+							CHP_SERVER_SELF, currDir, dent->d_name, dent->d_name);
+			else
+				CHP_PRINTF("<tr> <td class='e'>  <a href='http://%s/%s/%s'>%s </a> </td>",
+							CHP_HTTP_HEAD("Host"), currDir, dent->d_name, dent->d_name);
+
+			CHP_PRINTF("<td class='v'> %d %d/%d  %02d:%02d:%02d </td>", 
+							dent->d_ftime.Year, dent->d_ftime.Month,  dent->d_ftime.Day,
+							dent->d_ftime.Hour, dent->d_ftime.Minute, dent->d_ftime.Second);
+
+			if (dent->d_type & DT_DIR)
+				CHP_PRINTF("<td class='v'> - </td> </tr>");
+			else
+				CHP_PRINTF("<td class='v'> %d </td> </tr>", dent->d_fsize);
+		}
+		osal_closedir(dp);
+	}
+	/****************************************************************************************************
+    <tr>
+      <td class="e">HTTP_HOST </td> <td class="v">127.0.0.1 </td>
+    </tr>
+    <tr>
+      <td class="e">HTTP_CONNECTION </td> <td class="v">keep-alive </td>
+    </tr>
+	****************************************************************************************************/
+?>
+
+  </tbody>
+</table>
+<br />
+</div>
+
+</body></html>

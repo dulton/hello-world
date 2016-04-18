@@ -1,0 +1,3 @@
+#define CGI_STREAM_IDLE 	-1
+#define CGI_STREAM_STOP 	-2
+#define CGI_POST_RETURNXML 	-11

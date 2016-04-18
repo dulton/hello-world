@@ -1,0 +1,45 @@
+ITCM_EXE	0x00000000 0x00002000
+{
+	ITCM_EXE    +0x0
+	{
+	    vector.o             (vector,+FIRST)
+	    cstartup*.o          (+RO,+RW)
+	    mmu.o                (+RO,+RW,+ZI)
+	    ;bsp*.o	             (+RO,+RW)
+	    ;mmpf_pll.o          (PLLAsync)
+	    ;mmpf_pll.o          (ChangePLL)
+	    ;mmpf_dram.o         (ResetMCI)
+	}
+}
+
+; (DUMMY)
+TCM_END 0x00081000   0x0
+{
+    TCM_END +0x0
+    {
+        .ANY                (dummy)
+    }
+}
+
+ALL_DRAM    0x010000F8  0x00020000
+{
+    RESET    0x010000F8
+    {
+        cstartup*.o         (reset,+FIRST)
+    }
+
+	CPU_COMM_MODULE_INIT  +0x0
+    {
+		*.o					(CpuCommModuleInit)
+    }
+	
+	CPU_COMM_MODULE_EXIT  +0x0
+    {
+		*.o					(CpuCommModuleExit)
+    }
+
+    ALL_DRAM    +0x0
+    {
+        .ANY                (+RO,+RW,+ZI)
+    }
+}

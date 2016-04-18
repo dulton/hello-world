@@ -1,0 +1,178 @@
+/*===========================================================================
+ * Include file 
+ *===========================================================================*/ 
+#include "AHC_task.h"
+#include "AHC_OS.h"
+#include "All_fw.h" //CarDV...
+#include "AHC_DebugEx.h"
+/*===========================================================================
+ * Global variable
+ *===========================================================================*/ 
+
+//#if defined(ALL_FW)
+UINT32  KeyPadStack[TASK_KEYPAD_STK_SIZE];
+UINT32  AhcMotorStack[TASK_MOTOR_STK_SIZE];
+UINT32  MotorWorkStack[TASK_MOTOR_STK_SIZE];
+UINT32  MotorCtrlStack[TASK_MOTOR_STK_SIZE];
+//UINT32  AhcStack[TASK_AHC_STK_SIZE];
+UINT32  AhcWorkStack[TASK_AHC_WORK_STK_SIZE];
+UINT32  AhcWork2Stack[TASK_AHC_WORK_STK_SIZE];
+//#endif
+
+#if (FW_DCF_BACKGROUND == 1)
+UINT32  AhcDcfStack[TASK_AHC_DCF_STK_SIZE];
+#endif
+
+#if (KEYPAD_DETECT_METHOD == KEYPAD_DETECT_TASK)
+UINT32  RealIDKeyPadStack[TASK_REALIDKEYPAD_STK_SIZE];
+#endif
+
+UINT32  UARTCtrlStack[TASK_UARTCRTL_STK_SIZE];
+
+//Wifi
+#if (WIFI_PORT == 1)
+UINT32  Streaming_Task_Stk[TASK_STREAMING_STK_SIZE];
+UINT32  NETWORK_Task_Stk[TASK_NETWORK_STK_SIZE];
+#endif
+
+/*===========================================================================
+ * Extern function
+ *===========================================================================*/ 
+
+extern  void AHC_WorkStack_Task(void *p_arg);
+extern  void UIKeyTask(void);
+extern  void AHC_WorkJob_Task(void *p_arg);
+
+#if (FW_DCF_BACKGROUND == 1)
+extern	void AHC_DCF_Task(void *p_arg);
+#endif 
+
+#if(KEYPAD_DETECT_METHOD == KEYPAD_DETECT_TASK)
+extern  void RealIDKeyPadTask(void *p_arg);
+extern  void RealIDUIKeyTask(void);
+#endif
+
+/*===========================================================================
+ * Main body
+ *===========================================================================*/ 
+
+void KeyPadTask(void *p_arg)
+{
+    UIKeyTask();
+}
+
+void AhcWorkTask(void *p_arg)
+{
+    AHC_WorkStack_Task(p_arg);
+}
+
+void AhcWorkJobTask(void *p_arg)
+{
+    AHC_WorkJob_Task(p_arg);
+}
+
+#if (FW_DCF_BACKGROUND == 1)
+void AhcDcfTask(void *p_arg)
+{
+    AHC_DCF_Task(p_arg);
+}
+#endif
+
+#if(KEYPAD_DETECT_METHOD == KEYPAD_DETECT_TASK)
+void RealIDKeyPadTask(void *p_arg)
+{
+    RealIDUIKeyTask();
+}
+
+void AHC_SWPACK_TaskInit(void)
+{    
+    AHC_OS_TASK_CFG task_cfg;
+
+    AHC_MemoryMonitor(AHC_TRUE);
+
+    //Note: Initaial priority is TASK_AHC_INIT_PRIO which higher than any other AHC tasks.
+    
+#if( AIT_LENS_TYPE != AIT_LENS_TYPE_DUMMY )
+    task_cfg.ubPriority = TASK_MOTOR_CTRL_PRIO;
+    task_cfg.pbos = (MMP_ULONG)&MotorCtrlStack[0];
+    task_cfg.ptos = (MMP_ULONG)&MotorCtrlStack[TASK_MOTOR_STK_SIZE-1];
+    //MMPF_OS_CreateTask(MotorCtrlTask, &task_cfg, (void *)"MotorCtrl");
+    AHC_OS_CreateTask(MotorCtrlTask, &task_cfg, (void *)"MotorCtrl");
+    AHC_OS_SetTaskName(task_cfg.ubPriority, (UINT8 *)"MotorCtrl");
+#endif //( AIT_LENS_TYPE != AIT_LENS_TYPE_DUMMY )
+
+#if 0
+    task_cfg.ubPriority = TASK_AHC_MOTOR_PRIO;
+    task_cfg.pbos = (MMP_ULONG)&AhcMotorStack[0];
+    task_cfg.ptos = (MMP_ULONG)&AhcMotorStack[TASK_MOTOR_STK_SIZE-1];
+    AHC_OS_CreateTask(AhcMotorTask, &task_cfg, (void *)"AhcMotor");
+
+    task_cfg.ubPriority = TASK_MOTOR_PRIO;
+    task_cfg.pbos = (MMP_ULONG)&MotorWorkStack[0];
+    task_cfg.ptos = (MMP_ULONG)&MotorWorkStack[TASK_MOTOR_STK_SIZE-1];
+    AHC_OS_CreateTask(AhcMotorJobTask, &task_cfg, (void *)"Motor");
+#endif
+
+    task_cfg.ubPriority = TASK_KEYPAD_PRIO;
+    task_cfg.pbos = (MMP_ULONG)&KeyPadStack[0];
+    task_cfg.ptos = (MMP_ULONG)&KeyPadStack[TASK_KEYPAD_STK_SIZE-1];
+    AHC_OS_CreateTask(KeyPadTask, &task_cfg, (void *)"KeyPad");
+    AHC_OS_SetTaskName(task_cfg.ubPriority, (UINT8 *)"KeyPad");
+	
+#if (KEYPAD_DETECT_METHOD == KEYPAD_DETECT_TASK)	//test only
+    task_cfg.ubPriority = TASK_REALIDKEYPAD_PRIO;
+    task_cfg.pbos = (MMP_ULONG)&RealIDKeyPadStack[0];
+    task_cfg.ptos = (MMP_ULONG)&RealIDKeyPadStack[TASK_REALIDKEYPAD_STK_SIZE-1];
+    AHC_OS_CreateTask(RealIDKeyPadTask, &task_cfg, (void *)"RealIDKeyPad");
+    AHC_OS_SetTaskName(task_cfg.ubPriority, (UINT8 *)"RealIDKeyPad");
+#endif
+
+    task_cfg.ubPriority = TASK_AHC_WORK_PRIO;
+    task_cfg.pbos = (MMP_ULONG)&AhcWorkStack[0];
+    task_cfg.ptos = (MMP_ULONG)&AhcWorkStack[TASK_AHC_WORK_STK_SIZE-1];
+    AHC_OS_CreateTask(AhcWorkTask, &task_cfg, (void *)"AhcWork");
+    AHC_OS_SetTaskName(task_cfg.ubPriority, (UINT8 *)"AhcWork");
+
+    task_cfg.ubPriority = TASK_AHC_WORK2_PRIO;
+    task_cfg.pbos = (MMP_ULONG)&AhcWork2Stack[0];
+    task_cfg.ptos = (MMP_ULONG)&AhcWork2Stack[TASK_AHC_WORK_STK_SIZE-1];
+    AHC_OS_CreateTask(AhcWorkJobTask, &task_cfg, (void *)"AhcWorkJob");
+    AHC_OS_SetTaskName(task_cfg.ubPriority, (UINT8 *)"AhcWorkJob");
+
+    #if (WIFI_PORT == 1)//Andy Liu TBD
+    task_cfg.ubPriority = TASK_NETWORK_PRIO;
+    task_cfg.pbos = (MMP_ULONG)&NETWORK_Task_Stk[0];
+    task_cfg.ptos = (MMP_ULONG)&NETWORK_Task_Stk[TASK_NETWORK_STK_SIZE-1];
+    AHC_OS_CreateTask(NETWORK_TaskHandler, &task_cfg, (void *)"NETWORK");
+    AHC_OS_SetTaskName(task_cfg.ubPriority, (UINT8 *)"NETWORK");
+
+    task_cfg.ubPriority = TASK_STREAMING_PRIO;
+    task_cfg.pbos = (MMP_ULONG)&Streaming_Task_Stk[0];
+    task_cfg.ptos = (MMP_ULONG)&Streaming_Task_Stk[TASK_STREAMING_STK_SIZE-1];
+    AHC_OS_CreateTask(MMPF_Streaming_TaskHandler, &task_cfg, (void *)"Streaming");
+    AHC_OS_SetTaskName(task_cfg.ubPriority, (UINT8 *)"Streaming");
+    #endif
+    
+    /**
+    @brief	dcf background
+    */
+#if (FW_DCF_BACKGROUND == 1)
+    task_cfg.ubPriority = TASK_AHC_DCF_PRIO;
+    task_cfg.pbos = (MMP_ULONG)&AhcDcfStack[0];
+    task_cfg.ptos = (MMP_ULONG)&AhcDcfStack[TASK_AHC_DCF_STK_SIZE-1];
+    AHC_OS_CreateTask(AhcDcfTask, &task_cfg, (void *)"AhcDcf");
+    AHC_OS_SetTaskName(task_cfg.ubPriority, (UINT8 *)"AhcDcf");
+#endif
+
+    task_cfg.ubPriority = TASK_UART_CTRL_PRIO;
+    task_cfg.pbos = (MMP_ULONG)&UARTCtrlStack[0];
+    task_cfg.ptos = (MMP_ULONG)&UARTCtrlStack[TASK_UARTCRTL_STK_SIZE-1];
+    AHC_OS_CreateTask(UARTCtrl_TaskHandler, &task_cfg, (void *)"UARTCtrl");
+    AHC_OS_SetTaskName(task_cfg.ubPriority, (UINT8 *)"UARTCtrl");
+
+    AHC_OS_ChangeTaskPriority(TASK_AHC_INIT_PRIO, TASK_AHC_PRIO);
+}
+
+#endif
+
+

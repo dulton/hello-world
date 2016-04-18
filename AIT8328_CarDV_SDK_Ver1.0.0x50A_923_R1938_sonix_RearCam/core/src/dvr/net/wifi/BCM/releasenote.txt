@@ -1,0 +1,185 @@
+Version 3.11, 2013-05-08
+===============================
+1. Features and Enhancements:
+	- This release doesn't call printc directly and use an OS wrapper instead
+	- The gb9662_mfg.a is for manufacturing test only
+	
+2. Bug fixes:
+   
+3. Known issues:
+
+4. To do:
+
+
+Version 3.10, 2013-05-04
+===============================
+1. Features and Enhancements:
+   - This release is only for 安規測試
+   
+2. Bug fixes:
+   - Fixed wlan_mfg_rx_getpkt() always returns 0 issue 
+   
+3. Known issues:
+
+4. To do:
+
+
+Version 3.09, 2013-04-12
+===============================
+1. Features and Enhancements:
+   - This release is only for 安規測試
+   
+2. Bug fixes:
+   
+3. Known issues:
+
+4. To do:
+
+
+Version 3.08, 2013-04-04
+===============================
+1. Features and Enhancements:
+   - Release related source of wl tool and please use below compiling flags to buile the cource
+	 (-DTARGETOS_ucOS -DWLBTAMP -D_ASFPARSE_ONLY_ -DUSE_LWIP -DUNRELEASEDCHIP -DBCMDONGLEHOST -DLWIP_DEBUG -DDHD_BCMEVENTS -DBWL_SMALL_WLU_DUMP_BUF -DBCMWPA2 -DDHDTHREAD -DBWL_NO_FILESYSTEM_SUPPORT -DBCMSDIOH_STD -DBCMEMBEDIMAGE=rtecdc.h -DRWL_DONGLE -DBCMDRIVER -DTOE -DBCMSDIO -DBUILD_FW -DBWL_STRICMP -DWPS_DEBUG_LEVEL3 -DWPS_DEBUG_LEVEL2 -DWPS_DEBUG_LEVEL1 -DBDC -DWMAAPI_NO_DRM -DWLPFN)
+   - Scan buffer size can be configured by wlan_start() and wlan_wps_start() APIs and is limited by 32KB
+   
+2. Bug fixes:
+   - Fixed some wl commands don't work issue
+   - Fixed cannot disable SSID broadcasting issue of SW AP mode
+   - Fixed reporting wrong WPS status issue
+   
+3. Known issues:
+
+4. To do:
+
+
+Version 3.07, 2013-03-20
+===============================
+1. Features and Enhancements:
+   - Add wl command support
+   - Add event callback for WPS
+   - Add WPS PIN support
+   - WPS scan buffer size can be configured
+   - Add wlan_wps_get_status() to get WPS status when WPS failed (E.g. two WPS PBC enabled APs)
+   - WPS AP reconnection time can be configured
+   - Add wlan_get_mode()() to get current Wi-Fi mode (STA, WPS and SW AP)
+   
+2. Bug fixes:
+   
+3. Known issues:
+
+4. To do:
+
+
+Version 3.05, 2013-02-28
+===============================
+1. Features and Enhancements:
+	
+2. Bug fixes:
+   - Fixed WPS crashes system when target AP is powered off before WPS finished. 
+   
+3. Known issues:
+
+4. To do:
+
+
+Version 3.04, 2013-02-27
+===============================
+1. Features and Enhancements:
+	
+2. Bug fixes:
+   - Fix sometimes fail to get scan result by enlarging the scan buffer from 2KB to 32KB.
+   
+3. Known issues:
+
+4. To do:
+
+
+Version 3.03, 2013-02-25
+===============================
+1. Features and Enhancements:
+	
+2. Bug fixes:
+   - Remove tearing down TCP/IP stack while a STA disassociated in SW AP mode
+   
+3. Known issues:
+	- Sometimes fail to get scan result
+
+4. To do:
+
+
+Version 3.02, 2013-02-20
+===============================
+1. Features and Enhancements:
+	
+2. Bug fixes:
+   - Fixed wlan_get_connection_info() returning wrong PHY rate
+   
+3. Known issues:
+	- Sometimes fail to get scan result
+
+4. To do:
+
+
+Version 3.01, 2013-02-18
+===============================
+1. Features and Enhancements:
+   - Update WiFi firmware to SW AP one
+   - Add an API wlan_create_sw_ap() to create a SW AP network
+   - Add security information in wl_bss_info_t structure to determine WEP, WPA-PSK and WPA2-PSK securities
+   - Add an API wlan_get_connection_info() to get connection information such as SSID, RSSI and PHY rate
+	
+2. Bug fixes:
+   - Fixed cannot perform WPS more than two times
+   
+3. Known issues:
+	- Sometimes fail to get scan result
+
+4. To do:
+
+   
+Version 2.02, 2013-02-07
+===============================
+1. Features and Enhancements:
+   - Delete WPS related task and timers after WPS succeeds or timeout
+   - Add an API wlan_join_network_bssid() for join a network with specific BSSID
+	
+2. Bug fixes:
+   - Fixed sometimes cannot connect to AP after WPS succeeds
+   - Fixed wlan_wps_get_state() returns wrong state when WPS timeout and the correct state is WPS_STATE_OFF
+   
+3. Known issues:
+	- Sometimes fail to get scan result
+
+4. To do:
+   - Software AP function
+
+   
+Version 2.01, 2013-02-03
+===============================
+1. Features and Enhancements:
+   - Four APIs are added for WPS PBC support
+	 a. int wlan_wps_pbc(int *joinAP);
+	 b. int wlan_wps_stop(void);
+	 c. int wlan_wps_get_credentials(wl_config_info_t *wlan_config_info);
+	 d. WPS_STATE wlan_wps_get_state(void);
+	
+2. Bug fixes:
+
+3. Known issues:
+
+4. To do:
+   - Software AP function
+
+   
+Version 1.01, 2013-01-23
+===============================
+1. Features and Enhancements:
+   - Add wlan_get_version() for getting driver release version
+	
+2. Bug fixes:
+
+3. Known issues:
+
+4. To do:
+   - WPS and Software AP functions

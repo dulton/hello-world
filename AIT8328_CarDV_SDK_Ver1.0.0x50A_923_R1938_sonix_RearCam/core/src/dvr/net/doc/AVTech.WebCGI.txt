@@ -1,0 +1,4372 @@
+-------------------------------------------
+
+  AVTech IPCAM AVM301 Web CGI commands
+
+ Author by Bernard Shyu.  2013 Jan 31
+
+-------------------------------------------
+
+
+===========================================================================================================================================
+#############
+#  NOTE 1:  #
+#############
+This is a reverse engineering documentation by using Wireshark.
+Besides these CGI, there are other typical HTML / CSS / JS pages being transfered via HTTP GET. Just neglect them in this doc.
+
+
+#############
+#  NOTE 2:  #
+#############
+AVTech provides the below list of cgi-bin, its path structure should be:
+	/cgi-bin/<user-class>/<command-cgi>
+	where the <user-class> can be: nobody, guest, user, supervisor, power
+
+GET  /cgi-bin/nobody/Capability.cgi?action=get HTTP/1.1
+GET  /cgi-bin/nobody/Captcha.cgi?action=get&image=login_bmp HTTP/1.1
+POST /cgi-bin/guest/Login.cgi HTTP/1.1
+POST /cgi-bin/guest/Time.cgi HTTP/1.1
+POST /cgi-bin/guest/UserInfo.cgi HTTP/1.1
+POST /cgi-bin/nobody/Capability.cgi HTTP/1.1
+POST /cgi-bin/nobody/Machine.cgi HTTP/1.1
+POST /cgi-bin/power/Memory.cgi HTTP/1.1
+POST /cgi-bin/supervisor/DDns.cgi HTTP/1.1
+POST /cgi-bin/supervisor/Firmware.cgi HTTP/1.1
+POST /cgi-bin/supervisor/Log.cgi HTTP/1.1
+POST /cgi-bin/supervisor/PortMapping.cgi HTTP/1.1
+POST /cgi-bin/supervisor/PwdGrp.cgi HTTP/1.1
+POST /cgi-bin/supervisor/QOS.cgi HTTP/1.1
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+POST /cgi-bin/user/IO.cgi HTTP/1.1
+
+
+#############
+#  NOTE 3:  #
+#############
+The complete configuration space (POST /cgi-bin/user/Config.cgi  action=get&category=*):
+-----------------------------------------------------------------------------------------
+General.TurboStep=0
+General.Language=ENGLISH
+General.Maxlog=300
+General.DeviceTitle=IPCAM
+General.DefaultLanguage=ENGLISH
+General.StatusLed.Usage=ENABLE
+LogLevels.CritLogEnabled=YES
+LogLevels.InfoLogEnabled=YES
+LogLevels.WarningLogEnabled=YES
+Notification.Trigger.Alarm=ENABLE
+Notification.Trigger.Motion=ENABLE
+Notification.Trigger.PIR=ENABLE
+Notification.Trigger.Duration=5
+Notification.Method=NONE
+Notification.MethodList=NONE,MAIL,FTP,SMS
+Notification.MediaType=H264
+Notification.FileFormat=AVC
+Notification.RecordTime=3
+Notification.Guard=OFF
+Notification.GuardRule=12
+Notification.GuardRuleList=2,6,12
+Notification.SMSText=UHVzaCBWaWRlbyBBbGFybSE=
+Notification.GuardPush.MACAddress=00:0E:53:E8:7C:DA
+Notification.GuardTimer.Enable=OFF
+Notification.GuardTimer.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Notification.GuardTimer.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Notification.GuardTimer.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Notification.GuardTimer.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Notification.GuardTimer.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Notification.GuardTimer.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Notification.GuardTimer.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Notification.Action.EMailRule=NONE
+Notification.Action.EMailRuleList=ALARM;MOTION;PIR
+Notification.Action.FTPRule=NONE
+Notification.Action.FTPRuleList=ALARM;MOTION;PIR
+Notification.Action.SMSRule=NONE
+Notification.Action.SMSRuleList=ALARM;MOTION;PIR
+Notification.Action.AlarmOutRule=NONE
+Notification.Action.AlarmOutRuleList=ALARM;MOTION;PIR
+Notification.Action.LEDRule=ALARMOUTM
+Notification.Action.LEDRuleList=ALARM;MOTION;PIR;ALARMOUTM
+Notification.Action.RecordRule=ALARM|PIR
+Notification.Action.RecordRuleList=ALARM;PIR
+Notification.Action.SpeakerRule=ALARMOUTM
+Notification.Action.SpeakerRuleList=ALARMOUTM
+Notification.Policy.LED=ENABLE
+Notification.Policy.SlowShutter=ENABLE
+MailLogd.LogSendLevel=0
+Device.Address=uuid:98190dc2-0890-4ef8-ac9a-5940995e6119
+Device.DiscoveryMode=ON
+Device.Scopes.Count=4
+Device.Scopes.Scope1.ScopeItem=onvif://www.onvif.org/type/video_encoder
+Device.Scopes.Scope1.ScopeDef=Fixed
+Device.Scopes.Scope2.ScopeItem=onvif://www.onvif.org/location/AVTECH
+Device.Scopes.Scope2.ScopeDef=Fixed
+Device.Scopes.Scope3.ScopeItem=onvif://www.onvif.org/hardware/AVTECH
+Device.Scopes.Scope3.ScopeDef=Fixed
+Device.Scopes.Scope4.ScopeItem=onvif://www.onvif.org/name/AVTECH
+Device.Scopes.Scope4.ScopeDef=Fixed
+Camera.System.ID=1
+Camera.System.Display=ALL
+Camera.System.DisplayZoomRatio=ON
+Camera.System.Title=IPCAM
+Camera.System.Position=D-R
+Camera.System.Timeout=0
+Camera.System.IsTiltUpLimit=YES
+Camera.System.TurboStep=5
+Camera.System.Baudrate=2400
+Camera.System.IsAuto=NO
+Camera.System.IsAutoTracking=NO
+Camera.System.LocalControl=ENABLE
+Camera.System.Speed.Pan=30
+Camera.System.Speed.Tilt=30
+Camera.System.Speed.Zoom=128
+Camera.System.Speed.Focus=128
+Camera.General.ItemList=WhiteBalance;Sharpness;Shutter;Mirror;Flip;Denoise;
+Camera.General.WhiteBalance.Value=0
+Camera.General.WhiteBalance.Default=0
+Camera.General.WhiteBalance.Max=5
+Camera.General.WhiteBalance.Min=0
+Camera.General.Shutter.Value=0
+Camera.General.Shutter.Default=2
+Camera.General.Shutter.Max=5
+Camera.General.Shutter.Min=0
+Camera.General.Sharpness.Value=20
+Camera.General.Sharpness.Default=20
+Camera.General.Sharpness.Max=100
+Camera.General.Sharpness.Min=0
+Camera.General.Mirror.Value=0
+Camera.General.Mirror.Default=0
+Camera.General.Mirror.Max=1
+Camera.General.Mirror.Min=0
+Camera.General.Gamma.Value=4
+Camera.General.Gamma.Default=4
+Camera.General.Gamma.Max=4
+Camera.General.Gamma.Min=0
+Camera.General.Flip.Value=0
+Camera.General.Flip.Default=0
+Camera.General.Flip.Max=1
+Camera.General.Flip.Min=0
+Camera.General.Denoise.Value=1
+Camera.General.Denoise.Default=1
+Camera.General.Denoise.Max=10
+Camera.General.Denoise.Min=0
+Camera.Preset.Count=1
+Camera.Preset.P1.No=1
+Camera.Preset.P1.Name=HOME
+Camera.Cruise.Mode=AutoPan
+Camera.Cruise.SmartSorting=DISABLE
+Camera.Cruise.ActiveSeq=1
+Camera.Cruise.AutoPan.LeftLimit.Pan=0
+Camera.Cruise.AutoPan.RightLimit.Pan=0
+Camera.Cruise.AutoPan.Speed.Pan=30
+Camera.Cruise.Seq1.Count=0
+Camera.Cruise.Seq2.Count=0
+Camera.Cruise.Seq3.Count=0
+Camera.Cruise.Seq4.Count=0
+Camera.Cruise.Seq4.AnchorNo=
+Camera.Tracking.LimitP1=1280
+Camera.Tracking.LimitP2=0
+Camera.Tracking.Time=10
+Camera.Detection.Sensitivity=1
+Camera.Detection.MaskArea=ff,ff,ff,ff,7,ff,7e,0,e0,0,0,7,0,7e,7,e0,7e,0,e0,0,0,7,0,7e,7,e0,7e,0,e0,0,0,7,ff,fe,ff,ff,ff,ff
+Camera.HDD.HddNearFullSize=5
+Camera.Record.Overwrite=NO
+Camera.Record.PreRecord=YES
+Camera.Record.Enable=OFF
+Camera.Record.Device.List=AUTO;RAMDISK
+Camera.Record.Device.Name=AUTO
+Camera.Record.Video.ResolutionList=SXGA;HD720P;VGA;QVGA
+Camera.Record.Video.Resolution=HD720P
+Camera.Record.Audio.Enable=OFF
+Camera.Record.List=Alarm;PIR
+Camera.Record.Manual.Enable=OFF
+Camera.Record.Manual.Time=600
+Camera.Record.Timer.Enable=OFF
+Camera.Record.Timer.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.Enable=OFF
+Camera.Record.Motion.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.Enable=ON
+Camera.Record.Alarm.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.Enable=ON
+Camera.Record.PIR.Time=10
+Camera.Record.PIR.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Device.CH1.DeviceType=CAMERA
+Camera.Device.CH1.ID=0
+Camera.Device.CH1.Protocol=NORMAL
+Camera.Device.CH1.Rate=9600
+Camera.Led.Enable=ON
+Camera.Led.Level=100
+Camera.Led.List=Timer;Manual;Motion;Alarm
+Camera.Led.Manual.Enable=OFF
+Camera.Led.Manual.Level=0
+Camera.Led.Timer.Enable=OFF
+Camera.Led.Timer.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Timer.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Timer.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Timer.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Timer.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Timer.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Timer.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Motion.Enable=OFF
+Camera.Led.Motion.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Motion.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Motion.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Motion.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Motion.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Motion.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Motion.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Alarm.Enable=OFF
+Camera.Led.Alarm.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Alarm.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Alarm.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Alarm.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF0
+Camera.Led.Alarm.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Alarm.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Alarm.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.PIR.Enable=OFF
+Camera.Led.PIR.Time=10
+Camera.Led.PIR.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.PIR.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.PIR.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.PIR.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF0
+Camera.Led.PIR.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.PIR.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.PIR.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Auto.Enable=OFF
+Account.Maxuser=10
+Account.AnonymousLogin=DISABLE
+Account.LocalPassword=0000
+Account.Group.PermitList=LiveView;Configuration;Playback;
+Account.Group.NameList=Administrator
+Account.User1.Username=admin
+Account.User1.Password=admin
+Account.User1.Level=SUPERVISOR
+Account.User1.Lifetime=INFINITE
+Network.BootProto=DHCP
+Network.IPAddress=192.168.0.158
+Network.Broadcast=192.168.1.255
+Network.DefaultRouter=192.168.0.254
+Network.SubnetMask=255.255.255.0
+Network.DNSServer1=168.95.1.1
+Network.DNSServer2=139.175.55.244
+Network.WebPort=88
+Network.DNSUpdate.Enabled=YES
+Network.DNSUpdate.Hostname=MAC000E53E87CDA
+Network.DNSUpdate.DNSName=default
+Network.SMTP.Port=25
+Network.SMTP.SSL=NO
+Network.SMTP.Authentication.Enabled=NO
+Network.FTP.Username=ftp
+Network.FTP.Password=1234
+Network.FTP.Port=21
+Network.FTP.Server=192.168.0.161
+Network.FTP.Directory=/home/ftp
+Network.SNTP.Period=0
+Network.SNTP.PeriodSecond=0
+Network.SNTP.GMT=57
+Network.SNTP.GMTOffset=480
+Network.SNTP.ServerName=tock.stdtime.gov.tw
+Network.SNTP.TimeZoneName=PST8PDT,M3.2.0/2,M11.1.0/2
+Network.eth0.MACAddress=00:0E:53:E8:7C:DA
+Network.Filter.ErrorCount=3
+Network.Filter.ErrorLocktime=0
+Network.Filter.ICMP8=ENABLE
+Network.Filter.Enabled=NO
+Network.Filter.Input.Policy=DENY
+Network.RTP.StartPort=50000
+Network.RTP.EndPort=60000
+Network.RTP.Multicast.Video.H264.ResolutionList=SXGA;HD720P;VGA;QVGA;QQVGA
+Network.RTP.Multicast.Video.H264.Address=239.101.101.101
+Network.RTP.Multicast.Video.H264.Port=9000
+Network.RTP.Multicast.Video.H264.HD720P.Address=239.101.101.102
+Network.RTP.Multicast.Video.H264.HD720P.Port=9000
+Network.RTP.Multicast.Video.H264.VGA.Address=239.101.101.103
+Network.RTP.Multicast.Video.H264.VGA.Port=9000
+Network.RTP.Multicast.Video.H264.QVGA.Address=239.101.101.104
+Network.RTP.Multicast.Video.H264.QVGA.Port=9000
+Network.RTP.Multicast.Video.H264.QQVGA.Address=239.101.101.105
+Network.RTP.Multicast.Video.H264.QQVGA.Port=9000
+Network.RTP.Multicast.Video.Mpeg4.ResolutionList=SXGA;HD720P;VGA;QVGA;QQVGA
+Network.RTP.Multicast.Video.Mpeg4.Address=239.101.102.101
+Network.RTP.Multicast.Video.Mpeg4.Port=9000
+Network.RTP.Multicast.Video.Mpeg4.HD720P.Address=239.101.102.102
+Network.RTP.Multicast.Video.Mpeg4.HD720P.Port=9000
+Network.RTP.Multicast.Video.Mpeg4.VGA.Address=239.101.102.103
+Network.RTP.Multicast.Video.Mpeg4.VGA.Port=9000
+Network.RTP.Multicast.Video.Mpeg4.QVGA.Address=239.101.102.104
+Network.RTP.Multicast.Video.Mpeg4.QVGA.Port=9000
+Network.RTP.Multicast.Video.Mpeg4.QQVGA.Address=239.101.102.105
+Network.RTP.Multicast.Video.Mpeg4.QQVGA.Port=9000
+Network.RTP.Multicast.Video.Jpeg.ResolutionList=SXGA;HD720P;VGA;QVGA;QQVGA
+Network.RTP.Multicast.Video.Jpeg.Address=239.101.103.101
+Network.RTP.Multicast.Video.Jpeg.Port=9000
+Network.RTP.Multicast.Video.Jpeg.HD720P.Address=239.101.103.102
+Network.RTP.Multicast.Video.Jpeg.HD720P.Port=9000
+Network.RTP.Multicast.Video.Jpeg.VGA.Address=239.101.103.103
+Network.RTP.Multicast.Video.Jpeg.VGA.Port=9000
+Network.RTP.Multicast.Video.Jpeg.QVGA.Address=239.101.103.104
+Network.RTP.Multicast.Video.Jpeg.QVGA.Port=9000
+Network.RTP.Multicast.Video.Jpeg.QQVGA.Address=239.101.103.105
+Network.RTP.Multicast.Video.Jpeg.QQVGA.Port=9000
+Network.RTP.Multicast.Audio.Address=239.101.104.101
+Network.RTP.Multicast.Audio.Port=9000
+Network.RTP.Multicast.TTL=15
+Network.RTSP.Enabled=YES
+Network.UPNP.Enabled=YES
+Network.UPNP.FriendlyName=IP CAMERA (Fixed) AVM301-000E53E87CDA
+Network.UPNP.Manufacturer=AVTECH Corporation.
+Network.UPNP.ManufacturerURL=http://www.avtech.com.tw/
+Network.UPNP.NATTraversal.Enabled=YES
+Network.UPNP.NATTraversal.HTTPPort=88
+Network.UPNP.NATTraversal.HTTPSPort=0
+Network.UPNP.NATTraversal.MinPort=32768
+Network.UPNP.NATTraversal.MaxPort=65535
+Network.ZeroConf.Enabled=NO
+Network.ZeroConf.SubnetMask=255.255.0.0
+Network.Bonjour.Enabled=YES
+Network.Bonjour.DeviceName=IP CAMERA (Fixed) AVM301-000E53E87CDA
+Network.HTML.Index=nobody/login.htm
+Network.HTML.Timeout=15
+Network.HTML.Config=YES
+Network.HTTPS.Port=443
+Network.HTTPS.CommonName=IP Address
+Network.HTTPS.OrganizationalUnitName=Unit Name
+Network.HTTPS.OrganizationName=Organization Name
+Network.HTTPS.LocalityName=City Name
+Network.HTTPS.ProvinceName=Province
+Network.HTTPS.CountryName=TW
+Network.HTTPS.PrivateKey=LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tDQpNSUlDZGdJQkFEQU5CZ2txaGtpRzl3MEJBUUVGQUFTQ0FtQXdnZ0pjQWdFQUFvR0JBTUJIeVBOa2tmL2g1aFMxDQpOenFkOE5oNy9MQVlVNndRM0d3MDBzZDFlN0dzdkE0U0h5eFAzNTR3TEVDSG9rWGFjS0xkZEtUdjZoakVOWisrDQpkYSs4NmhZNldQK2RNbEd1dHhsS0c2ZE5hckU3aDlMMU9CQk5GT1RuN3cwbHk1NWJ6aDFnK1B3cUtPRitVamFyDQo2QnVCS25udDFyemZkR3J6amNySTE4UkIzTXhOQWdNQkFBRUNnWUFyTjNjNURWK3JUWkN6RXMvcEF0ckJMWXpyDQozMnZlL3FNc1J1c2hIWXpCc0h0TUJsS3ZXUHgveDRBS3VQR0dGY1MvTmxzalB6RTBnOVV4cEZNN1BwQzJMaXZ6DQo3NEwzZ3ZsbnY0ZUZZYlFxY2ZvMG16aVF0VUVSb0tROXR6a0NqQ0J6RnpwTWx1dWMxQkU2VlFPQTJmbk1iRUwwDQpxTm9meHluWnU2eTNHM0RIbVFKQkFQRnk2UWZxVEJMTFZFSS9raEt3cGRhRTFwUHJJZWtWa3F0Q2JScnAwRDNqDQpoTkV2UTJsTXdoVjAyZnd2U2R0YUZKMFdxZDJobHJxSjlpSXZWNkhGeTA4Q1FRREwza3ppMEI3UGM5K1NBVENRDQpQZUgrZnY3dGJhem9aZk1BblBGUmYrMkU3THJXODBNSng5elJKQVVvdUlzUHJidnZEYlczb2wwdmYxazY1YkRhDQp3OWVqQWtFQW9Yb09hMkxBMmRqdVV4Z2M0eThNMmpraElQQWlUN1pEenhHdjBrNEpIVHJxZXRRM0sxZFFmZlVXDQpURmg3OXAxNko4MGVjY0UrQXlkOVcwTjZRaEQ4ZFFKQURsOGhkR3ZQZ0RoZTdsLy9HR3dFWG5oOWFDZHZKUUxxDQoyb1ExenRVQjNYa0N3dHhyUVdsQmU4emFRRUNpTFB6R1h0Zk1rNkZ5aUVLbCs2enRocjUvbVFKQVM3b0hPSXlkDQpFYUNkUEZKNllVNzVmYzQyMll2QkVIVjcwUmQzTnphN3VPclZXcGQ1NWdlTVpOUi9vRDJmNEM2aUxqS2UzdmdMDQpQUE5uZko5dGJuK2dSQT09DQotLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tDQo=
+Network.HTTPS.Certificate=LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tDQpNSUlDd0RDQ0FpbWdBd0lCQWdJSkFNckpwTVUyQnJlWE1BMEdDU3FHU0liM0RRRUJCUVVBTUhreEN6QUpCZ05WDQpCQVlUQWxSWE1SRXdEd1lEVlFRSURBaFFjbTkyYVc1alpURVNNQkFHQTFVRUJ3d0pRMmwwZVNCT1lXMWxNUm93DQpHQVlEVlFRS0RCRlBjbWRoYm1sNllYUnBiMjRnVG1GdFpURVNNQkFHQTFVRUN3d0pWVzVwZENCT1lXMWxNUk13DQpFUVlEVlFRRERBcEpVQ0JCWkdSeVpYTnpNQjRYRFRFd01EZ3hPREUzTVRnME1Gb1hEVEl3TURneE5URTNNVGcwDQpNRm93ZVRFTE1Ba0dBMVVFQmhNQ1ZGY3hFVEFQQmdOVkJBZ01DRkJ5YjNacGJtTmxNUkl3RUFZRFZRUUhEQWxEDQphWFI1SUU1aGJXVXhHakFZQmdOVkJBb01FVTl5WjJGdWFYcGhkR2x2YmlCT1lXMWxNUkl3RUFZRFZRUUxEQWxWDQpibWwwSUU1aGJXVXhFekFSQmdOVkJBTU1Da2xRSUVGa1pISmxjM013Z1o4d0RRWUpLb1pJaHZjTkFRRUJCUUFEDQpnWTBBTUlHSkFvR0JBTUJIeVBOa2tmL2g1aFMxTnpxZDhOaDcvTEFZVTZ3UTNHdzAwc2QxZTdHc3ZBNFNIeXhQDQozNTR3TEVDSG9rWGFjS0xkZEtUdjZoakVOWisrZGErODZoWTZXUCtkTWxHdXR4bEtHNmROYXJFN2g5TDFPQkJODQpGT1RuN3cwbHk1NWJ6aDFnK1B3cUtPRitVamFyNkJ1QktubnQxcnpmZEdyempjckkxOFJCM014TkFnTUJBQUdqDQpVREJPTUIwR0ExVWREZ1FXQkJTcUxhaHdyQ01IQVhrT2RUSGRnVVJxNDZXa2tqQWZCZ05WSFNNRUdEQVdnQlNxDQpMYWh3ckNNSEFYa09kVEhkZ1VScTQ2V2trakFNQmdOVkhSTUVCVEFEQVFIL01BMEdDU3FHU0liM0RRRUJCUVVBDQpBNEdCQUp2aXhFdTZzQ20wZTBPMFhVMXZ6QWVsNTdSR2dOajFON3MxSTUyMndUUkdleXpaWnpOdmxJSE1tak5MDQpYeGlsSXBqM1gzT04vK0doM0pwYU1LNC9SQUovL2dBSzhaaWIxRVJYbDBsM0x2T25ycGcyNWw2b00wYmdEYTg0DQo3dG5YalZqcGppMXkvNG43S0YybDhXV0dOa1pjSWMzRGdmTW55LzVGeGRkeHNkL3UNCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0NCg==
+Network.NAT.Enabled=NO
+Network.NAT.SyncDDNS=YES
+Network.NAT.Hostname=MAC000E53E87CDA
+Network.NAT.FirstUse=NO
+Network.WIFI.Enabled=YES
+Network.WIFI.BootProto=DHCP
+Network.WIFI.IPAddress=192.168.2.10
+Network.WIFI.SubnetMask=255.255.255.0
+Network.WIFI.DefaultRouter=192.168.2.254
+Network.WIFI.Profile.Default=1
+Network.WIFI.Profile.Max=10
+Network.WIFI.Profile.Used=2
+Network.WIFI.AP1.ProfileName=Default_ProfileName
+Network.WIFI.AP1.NetworkType=Adhoc
+Network.WIFI.AP1.AuthMode=OPEN
+Network.WIFI.AP1.EncrypType=NONE
+Network.WIFI.AP1.SSID=IP-CAMERA
+Network.WIFI.AP1.CHANNEL=1
+Network.WIFI.AP1.AdhocOfdm=1
+Network.WIFI.AP2.ProfileName=WPS_ProfileName
+Network.QOS.Enabled=NO
+Network.QOS.Device=eth0
+Network.QOS.Interface=eth0
+Network.QOS.MaxUploadRate=4096
+Network.SMS.System=clickatell
+Network.SMS.SystemList=clickatell;EVERY8D
+Network.SMS.Encryption=base64
+Network.SMS.Interval=15
+Network.SMS.AddDomainName=NO
+Network.SMS.SendType=SMS
+Network.MODEM.Enabled=NO
+Properties.Firmware.Version.FBoot=1008
+Properties.Firmware.Version.SBoot=1000
+Properties.Firmware.Version.Kernel=1024
+Properties.Firmware.Version.Application=1035
+Properties.Firmware.Version.Xml=1025
+Properties.Firmware.BuildDate=2007.01.04.
+Properties.Firmware.BuildNumber=1
+Properties.Image.Resolution=SXGA;HD720P;VGA;QVGA;QQVGA
+Properties.Image.Format=H264,MPEG4,MJPEG
+Properties.Image.Default=H264
+Properties.Audio.NbrOfSources=1
+Properties.Video.NbrOfSources=1
+Properties.Option=Resolution_Independent
+Video.Number=1
+Video.I0.Brightness=50
+Video.I0.BrightnessDefault=50
+Video.I0.BrightnessMax=100
+Video.I0.BrightnessMin=0
+Video.I0.Contrast=55
+Video.I0.ContrastDefault=55
+Video.I0.ContrastMax=100
+Video.I0.ContrastMin=0
+Video.I0.Saturation=65
+Video.I0.SaturationDefault=65
+Video.I0.SaturationMax=100
+Video.I0.SaturationMin=0
+Video.I0.Hue=50
+Video.I0.HueDefault=50
+Video.I0.HueMax=100
+Video.I0.HueMin=0
+Video.I0.System=NTSC
+Video.I0.PowerLineFrequency=60
+Video.I0.Framerate=0
+Video.I0.FramerateMax=30
+Video.I0.Jpeg.ResolutionList=SXGA;HD720P;VGA;QVGA;QQVGA
+Video.I0.Jpeg.Resolution=SXGA
+Video.I0.Jpeg.Quality=HIGH
+Video.I0.Jpeg.SXGA.Quality=BEST
+Video.I0.Jpeg.SXGA.Framerate=8
+Video.I0.Jpeg.HD720P.Quality=BEST
+Video.I0.Jpeg.HD720P.Framerate=8
+Video.I0.Jpeg.VGA.Quality=HIGH
+Video.I0.Jpeg.VGA.Framerate=30
+Video.I0.Jpeg.QVGA.Quality=HIGH
+Video.I0.Jpeg.QVGA.Framerate=30
+Video.I0.Jpeg.QQVGA.Quality=HIGH
+Video.I0.Jpeg.QQVGA.Framerate=30
+Video.I0.Mpeg4.ResolutionList=SXGA;HD720P;VGA;QVGA;QQVGA
+Video.I0.Mpeg4.Resolution=SXGA
+Video.I0.Mpeg4.Quality=HIGH
+Video.I0.Mpeg4.RateCtrlMode=EVBR
+Video.I0.Mpeg4.MaxBitrate=5000
+Video.I0.Mpeg4.SXGA.Quality=HIGH
+Video.I0.Mpeg4.SXGA.RateCtrlMode=EVBR
+Video.I0.Mpeg4.SXGA.MaxBitrate=5000
+Video.I0.Mpeg4.SXGA.Framerate=20
+Video.I0.Mpeg4.HD720P.Quality=HIGH
+Video.I0.Mpeg4.HD720P.RateCtrlMode=EVBR
+Video.I0.Mpeg4.HD720P.MaxBitrate=5000
+Video.I0.Mpeg4.HD720P.Framerate=20
+Video.I0.Mpeg4.VGA.Quality=HIGH
+Video.I0.Mpeg4.VGA.RateCtrlMode=EVBR
+Video.I0.Mpeg4.VGA.MaxBitrate=3000
+Video.I0.Mpeg4.VGA.Framerate=30
+Video.I0.Mpeg4.QVGA.Quality=HIGH
+Video.I0.Mpeg4.QVGA.RateCtrlMode=EVBR
+Video.I0.Mpeg4.QVGA.MaxBitrate=3000
+Video.I0.Mpeg4.QVGA.Framerate=30
+Video.I0.Mpeg4.QQVGA.Quality=HIGH
+Video.I0.Mpeg4.QQVGA.RateCtrlMode=EVBR
+Video.I0.Mpeg4.QQVGA.MaxBitrate=3000
+Video.I0.Mpeg4.QQVGA.Framerate=30
+Video.I0.H264.ResolutionList=SXGA;HD720P;VGA;QVGA;QQVGA
+Video.I0.H264.Resolution=SXGA
+Video.I0.H264.Quality=BEST
+Video.I0.H264.RateCtrlMode=EVBR
+Video.I0.H264.MaxBitrate=5000
+Video.I0.H264.SXGA.Quality=BEST
+Video.I0.H264.SXGA.RateCtrlMode=EVBR
+Video.I0.H264.SXGA.MaxBitrate=5000
+Video.I0.H264.SXGA.Framerate=30
+Video.I0.H264.HD720P.Quality=BEST
+Video.I0.H264.HD720P.RateCtrlMode=EVBR
+Video.I0.H264.HD720P.MaxBitrate=5000
+Video.I0.H264.HD720P.Framerate=30
+Video.I0.H264.VGA.Quality=HIGH
+Video.I0.H264.VGA.RateCtrlMode=EVBR
+Video.I0.H264.VGA.MaxBitrate=3000
+Video.I0.H264.VGA.Framerate=30
+Video.I0.H264.QVGA.Quality=HIGH
+Video.I0.H264.QVGA.RateCtrlMode=EVBR
+Video.I0.H264.QVGA.MaxBitrate=3000
+Video.I0.H264.QVGA.Framerate=30
+Video.I0.H264.QQVGA.Quality=HIGH
+Video.I0.H264.QQVGA.RateCtrlMode=EVBR
+Video.I0.H264.QQVGA.MaxBitrate=3000
+Video.I0.H264.QQVGA.Framerate=30
+Media.Profiles.Count=3
+Media.Profiles.Profile1.token=PROFILE-1
+Media.Profiles.Profile1.Name=PROFILE-1
+Media.Profiles.Profile1.VideoSourceConfiguration.token=VS1token
+Media.Profiles.Profile1.VideoSourceConfiguration.Name=VS1
+Media.Profiles.Profile1.VideoSourceConfiguration.UseCount=1
+Media.Profiles.Profile1.VideoSourceConfiguration.SourceToken=VS1srctoken
+Media.Profiles.Profile1.VideoSourceConfiguration.Bounds.x=0
+Media.Profiles.Profile1.VideoSourceConfiguration.Bounds.y=0
+Media.Profiles.Profile1.VideoSourceConfiguration.Bounds.width=352
+Media.Profiles.Profile1.VideoSourceConfiguration.Bounds.height=240
+Media.Profiles.Profile1.VideoEncoderConfiguration.token=VE1token
+Media.Profiles.Profile1.VideoEncoderConfiguration.Name=VE1
+Media.Profiles.Profile1.VideoEncoderConfiguration.UseCount=2
+Media.Profiles.Profile1.VideoEncoderConfiguration.Encoding=JPEG
+Media.Profiles.Profile1.VideoEncoderConfiguration.Resolution.Width=1280
+Media.Profiles.Profile1.VideoEncoderConfiguration.Resolution.Height=1024
+Media.Profiles.Profile1.VideoEncoderConfiguration.Quality=1.000000
+Media.Profiles.Profile1.VideoEncoderConfiguration.RateControl.FrameRateLimit=8
+Media.Profiles.Profile1.VideoEncoderConfiguration.RateControl.EncodingInterval=1
+Media.Profiles.Profile1.VideoEncoderConfiguration.RateControl.BitrateLimit=1400
+Media.Profiles.Profile1.VideoEncoderConfiguration.MPEG4.GovLength=30
+Media.Profiles.Profile1.VideoEncoderConfiguration.MPEG4.Mpeg4Profile=SP
+Media.Profiles.Profile1.VideoEncoderConfiguration.H264.GovLength=30
+Media.Profiles.Profile1.VideoEncoderConfiguration.H264.H264Profile=Baseline
+Media.Profiles.Profile1.VideoEncoderConfiguration.Multicast.Address.Type=IPv4
+Media.Profiles.Profile1.VideoEncoderConfiguration.Multicast.Port=0
+Media.Profiles.Profile1.VideoEncoderConfiguration.Multicast.TTL=0
+Media.Profiles.Profile1.VideoEncoderConfiguration.Multicast.AutoStart=false
+Media.Profiles.Profile1.VideoEncoderConfiguration.SessionTimeout=P1Y
+Media.Profiles.Profile1.AudioSourceConfiguration.token=AS1token
+Media.Profiles.Profile1.AudioSourceConfiguration.Name=AS1
+Media.Profiles.Profile1.AudioSourceConfiguration.UseCount=1
+Media.Profiles.Profile1.AudioSourceConfiguration.SourceToken=AS1srctoken
+Media.Profiles.Profile1.AudioEncoderConfiguration.token=AE1token
+Media.Profiles.Profile1.AudioEncoderConfiguration.Name=AE1
+Media.Profiles.Profile1.AudioEncoderConfiguration.UseCount=1
+Media.Profiles.Profile1.AudioEncoderConfiguration.Encoding=G711
+Media.Profiles.Profile1.AudioEncoderConfiguration.Bitrate=8192
+Media.Profiles.Profile1.AudioEncoderConfiguration.SampleRate=8000
+Media.Profiles.Profile1.AudioEncoderConfiguration.Multicast.Address.Type=IPv4
+Media.Profiles.Profile1.AudioEncoderConfiguration.Multicast.Port=0
+Media.Profiles.Profile1.AudioEncoderConfiguration.Multicast.TTL=0
+Media.Profiles.Profile1.AudioEncoderConfiguration.Multicast.AutoStart=false
+Media.Profiles.Profile1.AudioEncoderConfiguration.SessionTimeout=P1Y
+Media.Profiles.Profile1.PTZConfiguration.token=ptz001_token
+Media.Profiles.Profile1.PTZConfiguration.Name=ptz001
+Media.Profiles.Profile1.PTZConfiguration.NodeToken=node001_token
+Media.Profiles.Profile1.PTZConfiguration.DefaultAbsolutePantTiltPositionSpace=http://www.onvif.org/ver10/tptz/PanTiltSpaces/DigitalPositionSpace
+Media.Profiles.Profile1.PTZConfiguration.DefaultAbsoluteZoomPositionSpace=http://www.onvif.org/ver10/tptz/ZoomSpaces/NormalizedDigitalPositionSpace
+Media.Profiles.Profile1.PTZConfiguration.DefaultPTZSpeed.PanTilt.x=0.0
+Media.Profiles.Profile1.PTZConfiguration.DefaultPTZSpeed.PanTilt.y=1.0
+Media.Profiles.Profile1.PTZConfiguration.PanTiltLimits.Range.XRange.Max=1
+Media.Profiles.Profile1.PTZConfiguration.PanTiltLimits.Range.XRange.Min=-1
+Media.Profiles.Profile1.PTZConfiguration.PanTiltLimits.Range.YRange.Max=1
+Media.Profiles.Profile1.PTZConfiguration.PanTiltLimits.Range.YRange.Min=-1
+Media.Profiles.Profile1.PTZConfiguration.ZoomLimits.Range.XRange.Max=1
+Media.Profiles.Profile1.PTZConfiguration.ZoomLimits.Range.XRange.Min=0
+Media.Profiles.Profile2.token=PROFILE-2
+Media.Profiles.Profile2.Name=PROFILE-2
+Media.Profiles.Profile2.VideoSourceConfiguration.token=VS1token
+Media.Profiles.Profile2.VideoSourceConfiguration.Name=VS1
+Media.Profiles.Profile2.VideoSourceConfiguration.UseCount=1
+Media.Profiles.Profile2.VideoSourceConfiguration.SourceToken=VS1srctoken
+Media.Profiles.Profile2.VideoSourceConfiguration.Bounds.x=0
+Media.Profiles.Profile2.VideoSourceConfiguration.Bounds.y=0
+Media.Profiles.Profile2.VideoSourceConfiguration.Bounds.width=352
+Media.Profiles.Profile2.VideoSourceConfiguration.Bounds.height=240
+Media.Profiles.Profile2.VideoEncoderConfiguration.token=VE2token
+Media.Profiles.Profile2.VideoEncoderConfiguration.Name=VE2
+Media.Profiles.Profile2.VideoEncoderConfiguration.UseCount=1
+Media.Profiles.Profile2.VideoEncoderConfiguration.Encoding=MPEG4
+Media.Profiles.Profile2.VideoEncoderConfiguration.Resolution.Width=352
+Media.Profiles.Profile2.VideoEncoderConfiguration.Resolution.Height=240
+Media.Profiles.Profile2.VideoEncoderConfiguration.Quality=5
+Media.Profiles.Profile2.VideoEncoderConfiguration.RateControl.FrameRateLimit=30
+Media.Profiles.Profile2.VideoEncoderConfiguration.RateControl.EncodingInterval=1
+Media.Profiles.Profile2.VideoEncoderConfiguration.RateControl.BitrateLimit=1400
+Media.Profiles.Profile2.VideoEncoderConfiguration.MPEG4.GovLength=30
+Media.Profiles.Profile2.VideoEncoderConfiguration.MPEG4.Mpeg4Profile=SP
+Media.Profiles.Profile2.VideoEncoderConfiguration.H264.GovLength=30
+Media.Profiles.Profile2.VideoEncoderConfiguration.H264.H264Profile=Baseline
+Media.Profiles.Profile2.VideoEncoderConfiguration.Multicast.Address.Type=IPv4
+Media.Profiles.Profile2.VideoEncoderConfiguration.Multicast.Port=0
+Media.Profiles.Profile2.VideoEncoderConfiguration.Multicast.TTL=0
+Media.Profiles.Profile2.VideoEncoderConfiguration.Multicast.AutoStart=false
+Media.Profiles.Profile2.VideoEncoderConfiguration.SessionTimeout=P1Y
+Media.Profiles.Profile2.AudioSourceConfiguration.token=AS1token
+Media.Profiles.Profile2.AudioSourceConfiguration.Name=AS1
+Media.Profiles.Profile2.AudioSourceConfiguration.UseCount=1
+Media.Profiles.Profile2.AudioSourceConfiguration.SourceToken=AS1srctoken
+Media.Profiles.Profile2.AudioEncoderConfiguration.token=AE2token
+Media.Profiles.Profile2.AudioEncoderConfiguration.Name=AE2
+Media.Profiles.Profile2.AudioEncoderConfiguration.UseCount=1
+Media.Profiles.Profile2.AudioEncoderConfiguration.Encoding=G711
+Media.Profiles.Profile2.AudioEncoderConfiguration.Bitrate=8192
+Media.Profiles.Profile2.AudioEncoderConfiguration.SampleRate=8000
+Media.Profiles.Profile2.AudioEncoderConfiguration.Multicast.Address.Type=IPv4
+Media.Profiles.Profile2.AudioEncoderConfiguration.Multicast.Port=0
+Media.Profiles.Profile2.AudioEncoderConfiguration.Multicast.TTL=0
+Media.Profiles.Profile2.AudioEncoderConfiguration.Multicast.AutoStart=false
+Media.Profiles.Profile2.AudioEncoderConfiguration.SessionTimeout=P1Y
+Media.Profiles.Profile3.token=PROFILE-3
+Media.Profiles.Profile3.Name=PROFILE-3
+Media.Profiles.Profile3.VideoSourceConfiguration.token=VS1token
+Media.Profiles.Profile3.VideoSourceConfiguration.Name=VS1
+Media.Profiles.Profile3.VideoSourceConfiguration.UseCount=1
+Media.Profiles.Profile3.VideoSourceConfiguration.SourceToken=VS1srctoken
+Media.Profiles.Profile3.VideoSourceConfiguration.Bounds.x=0
+Media.Profiles.Profile3.VideoSourceConfiguration.Bounds.y=0
+Media.Profiles.Profile3.VideoSourceConfiguration.Bounds.width=352
+Media.Profiles.Profile3.VideoSourceConfiguration.Bounds.height=240
+Media.Profiles.Profile3.VideoEncoderConfiguration.token=VE3token
+Media.Profiles.Profile3.VideoEncoderConfiguration.Name=VE3
+Media.Profiles.Profile3.VideoEncoderConfiguration.UseCount=1
+Media.Profiles.Profile3.VideoEncoderConfiguration.Encoding=H264
+Media.Profiles.Profile3.VideoEncoderConfiguration.Resolution.Width=352
+Media.Profiles.Profile3.VideoEncoderConfiguration.Resolution.Height=240
+Media.Profiles.Profile3.VideoEncoderConfiguration.Quality=5
+Media.Profiles.Profile3.VideoEncoderConfiguration.RateControl.FrameRateLimit=30
+Media.Profiles.Profile3.VideoEncoderConfiguration.RateControl.EncodingInterval=1
+Media.Profiles.Profile3.VideoEncoderConfiguration.RateControl.BitrateLimit=1400
+Media.Profiles.Profile3.VideoEncoderConfiguration.MPEG4.GovLength=30
+Media.Profiles.Profile3.VideoEncoderConfiguration.MPEG4.Mpeg4Profile=SP
+Media.Profiles.Profile3.VideoEncoderConfiguration.H264.GovLength=30
+Media.Profiles.Profile3.VideoEncoderConfiguration.H264.H264Profile=Baseline
+Media.Profiles.Profile3.VideoEncoderConfiguration.Multicast.Address.Type=IPv4
+Media.Profiles.Profile3.VideoEncoderConfiguration.Multicast.Port=0
+Media.Profiles.Profile3.VideoEncoderConfiguration.Multicast.TTL=0
+Media.Profiles.Profile3.VideoEncoderConfiguration.Multicast.AutoStart=false
+Media.Profiles.Profile3.VideoEncoderConfiguration.SessionTimeout=P1Y
+Media.Profiles.Profile3.AudioSourceConfiguration.token=AS1token
+Media.Profiles.Profile3.AudioSourceConfiguration.Name=AS1
+Media.Profiles.Profile3.AudioSourceConfiguration.UseCount=1
+Media.Profiles.Profile3.AudioSourceConfiguration.SourceToken=AS1srctoken
+Media.Profiles.Profile3.AudioEncoderConfiguration.token=AE3token
+Media.Profiles.Profile3.AudioEncoderConfiguration.Name=AE3
+Media.Profiles.Profile3.AudioEncoderConfiguration.UseCount=1
+Media.Profiles.Profile3.AudioEncoderConfiguration.Encoding=G711
+Media.Profiles.Profile3.AudioEncoderConfiguration.Bitrate=8192
+Media.Profiles.Profile3.AudioEncoderConfiguration.SampleRate=8000
+Media.Profiles.Profile3.AudioEncoderConfiguration.Multicast.Address.Type=IPv4
+Media.Profiles.Profile3.AudioEncoderConfiguration.Multicast.Port=0
+Media.Profiles.Profile3.AudioEncoderConfiguration.Multicast.TTL=0
+Media.Profiles.Profile3.AudioEncoderConfiguration.Multicast.AutoStart=false
+Media.Profiles.Profile3.AudioEncoderConfiguration.SessionTimeout=P1Y
+Brand.Brand=AVTECH
+Brand.ProdFullName=Surveillance
+Brand.ProdMajorNbr=718
+Brand.ProdMinorNbr=AVM301
+Brand.ProdType=IPCAM
+Brand.WebURL=http://www.avtech.com.tw
+Audio.Input.Volume.Max=10
+Audio.Input.Volume.Min=1
+Audio.Input.Volume.Value=5
+Audio.Input.Volume.Default=5
+Audio.Input.Mute=0
+Audio.Output.Volume.Max=10
+Audio.Output.Volume.Min=1
+Audio.Output.Volume.Value=5
+Audio.Output.Volume.Default=5
+Audio.Output.Mute=0
+Misc.Time.OSD.Enable=OFF
+Misc.DaylightSaving.Enable=OFF
+Misc.DaylightSaving.DaylightStart=07-01-0 6:00
+Misc.DaylightSaving.DaylightEnd=09-01-4 10:00
+Misc.DaylightSaving.AdjustTime=1:00
+Misc.Wizard.Auto=YES
+Misc.External.DI.Port1.Channel=1;
+Misc.External.DI.Port1.Active=N.O.
+Misc.External.DO.Port1.Channel=1;
+Misc.External.DO.Port1.Trigger=NONE
+Misc.External.DO.Port1.Active=LOW
+Misc.External.DO.Manual.Duration=20
+Misc.IOControl.Number=7
+Misc.IOControl.IO1.Title=IO-1
+Misc.IOControl.IO1.Switch=OFF
+Misc.IOControl.IO1.Baudrate=9600
+Misc.IOControl.IO2.Title=IO-2
+Misc.IOControl.IO2.Switch=OFF
+Misc.IOControl.IO2.Baudrate=9600
+Misc.IOControl.IO3.Title=IO-3
+Misc.IOControl.IO3.Switch=OFF
+Misc.IOControl.IO3.Baudrate=9600
+Misc.IOControl.IO4.Title=IO-4
+Misc.IOControl.IO4.Switch=OFF
+Misc.IOControl.IO4.Baudrate=9600
+Misc.IOControl.IO5.Title=IO-5
+Misc.IOControl.IO5.Switch=OFF
+Misc.IOControl.IO5.Baudrate=9600
+Misc.IOControl.IO6.Title=IO-6
+Misc.IOControl.IO6.Switch=OFF
+Misc.IOControl.IO6.Baudrate=9600
+Misc.IOControl.IO7.Title=IO-7
+Misc.IOControl.IO7.Switch=OFF
+Misc.IOControl.IO7.Baudrate=9600
+Misc.IOBox.Input1.Enable=OFF
+Misc.IOBox.Input1.AutoTracking=OFF
+Misc.IOBox.Input1.DwellTime=5
+Misc.IOBox.Input1.PresetNo=1
+Misc.IOBox.Input1.Active=N.C.
+Misc.IOBox.Input2.Enable=OFF
+Misc.IOBox.Input2.AutoTracking=OFF
+Misc.IOBox.Input2.DwellTime=5
+Misc.IOBox.Input2.PresetNo=2
+Misc.IOBox.Input2.Active=N.C.
+Misc.IOBox.Input3.Enable=OFF
+Misc.IOBox.Input3.AutoTracking=OFF
+Misc.IOBox.Input3.DwellTime=5
+Misc.IOBox.Input3.PresetNo=3
+Misc.IOBox.Input3.Active=N.C.
+Misc.IOBox.Input4.Enable=OFF
+Misc.IOBox.Input4.AutoTracking=OFF
+Misc.IOBox.Input4.DwellTime=5
+Misc.IOBox.Input4.PresetNo=4
+Misc.IOBox.Input4.Active=N.C.
+Misc.IOBox.Input5.Enable=OFF
+Misc.IOBox.Input5.AutoTracking=OFF
+Misc.IOBox.Input5.DwellTime=5
+Misc.IOBox.Input5.PresetNo=5
+Misc.IOBox.Input5.Active=N.C.
+Misc.IOBox.Input6.Enable=OFF
+Misc.IOBox.Input6.AutoTracking=OFF
+Misc.IOBox.Input6.DwellTime=5
+Misc.IOBox.Input6.PresetNo=6
+Misc.IOBox.Input6.Active=N.C.
+Misc.IOBox.Input7.Enable=OFF
+Misc.IOBox.Input7.AutoTracking=OFF
+Misc.IOBox.Input7.DwellTime=5
+Misc.IOBox.Input7.PresetNo=7
+Misc.IOBox.Input7.Active=N.C.
+Misc.IOBox.Input8.Enable=OFF
+Misc.IOBox.Input8.AutoTracking=OFF
+Misc.IOBox.Input8.DwellTime=5
+Misc.IOBox.Input8.PresetNo=8
+Misc.IOBox.Input8.Active=N.C.
+Misc.IOBox.Input9.Enable=OFF
+Misc.IOBox.Input9.AutoTracking=OFF
+Misc.IOBox.Input9.DwellTime=5
+Misc.IOBox.Input9.PresetNo=9
+Misc.IOBox.Input9.Active=N.C.
+Misc.IOBox.Input10.Enable=OFF
+Misc.IOBox.Input10.AutoTracking=OFF
+Misc.IOBox.Input10.DwellTime=5
+Misc.IOBox.Input10.PresetNo=10
+Misc.IOBox.Input10.Active=N.C.
+Misc.IOBox.Input11.Enable=OFF
+Misc.IOBox.Input11.AutoTracking=OFF
+Misc.IOBox.Input11.DwellTime=5
+Misc.IOBox.Input11.PresetNo=11
+Misc.IOBox.Input11.Active=N.C.
+Misc.IOBox.Input12.Enable=OFF
+Misc.IOBox.Input12.AutoTracking=OFF
+Misc.IOBox.Input12.DwellTime=5
+Misc.IOBox.Input12.PresetNo=12
+Misc.IOBox.Input12.Active=N.C.
+Misc.IOBox.Input13.Enable=OFF
+Misc.IOBox.Input13.AutoTracking=OFF
+Misc.IOBox.Input13.DwellTime=5
+Misc.IOBox.Input13.PresetNo=13
+Misc.IOBox.Input13.Active=N.C.
+Misc.IOBox.Input14.Enable=OFF
+Misc.IOBox.Input14.AutoTracking=OFF
+Misc.IOBox.Input14.DwellTime=5
+Misc.IOBox.Input14.PresetNo=14
+Misc.IOBox.Input14.Active=N.C.
+Misc.IOBox.Input15.Enable=OFF
+Misc.IOBox.Input15.AutoTracking=OFF
+Misc.IOBox.Input15.DwellTime=5
+Misc.IOBox.Input15.PresetNo=15
+Misc.IOBox.Input15.Active=N.C.
+Misc.IOBox.Input16.Enable=OFF
+Misc.IOBox.Input16.AutoTracking=OFF
+Misc.IOBox.Input16.DwellTime=5
+Misc.IOBox.Input16.PresetNo=16
+Misc.IOBox.Input16.Active=N.C.
+Misc.IOBox.Output1.Enable=OFF
+Misc.IOBox.Output1.TriggerInput=0
+Misc.IOBox.Output1.Active=LOW
+GPS.Location=25.040076746689472,121.51211500167846
+GPS.Zoom=1
+GPS.GMapKey=ABQIAAAAm_S5faxhNvbQCPHzsJNBVxRfWanLLCphprUHhM3Ro32oaDF9qBTNLjWf0DY1IXIjA3zgEPBqfBgNhQ
+
+
+
+===========================================================================================================================================
+NOTIFY * HTTP/1.1
+HOST: 239.255.255.250:1900
+CACHE-CONTROL: max-age=120
+LOCATION: http://192.168.0.158:88/nobody/Mediadesc.xml
+SERVER: Linux/2.x UPnP/1.0 Avtech/1.0
+X-User-Agent: redsonic
+NT: upnp:rootdevice
+USN: uuid:upnp-surveillance-1_0-000E53E87CDA::upnp:rootdevice
+NTS: ssdp:alive
+
+
+
+===========================================================================================================================================
+GET /cgi-bin/nobody/Capability.cgi?action=get HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Accept: */*
+Referer: http://192.168.0.158:88/
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: captcha=UQWca0arDfMYw; x=1; SSID=YWRtaW46YWRtaW4=; pbAudioFalg=ON; RESOLUTION=720P; MEDIA TYPE=H264; ReloWebTime=0; LifeTime=524649; IdleTime=-62
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:27:19 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 1049
+
+0
+OK
+Device=IPCAM
+DeviceName=IPCAM (FIXED)
+ID=AVM301
+NetworkID=AVN305
+DeviceID=1
+Capability.HTTP.Port=88
+Capability.HTML.Timeout=15
+Capability.HTML.Config=YES
+Capability.Video.Input.Channel=1
+Capability.Video.Format=H264,MPEG4,MJPEG
+Capability.Video.Resolution=SXGA,HD720P,VGA,QVGA
+Capability.Video.Size=SXGA:1280x1024,HD720P:1280x720,VGA:640x480,QVGA:320x240
+Capability.Video.Framerate.Max=30
+Capability.Video.MotionArea=QVGA
+Capability.Video.TimeStamp=YES
+Capability.Video.MobileFormat=H264
+Capability.Mobile.Advance=YES
+Capability.Audio.Input.Channel=1
+Capability.Audio.Output.Channel=0
+Capability.Audio.Format=ULAW
+Capability.Peripherals=Memory,AudioIn,AlarmIn,AlarmOut,PIR,StatusLED
+Capability.PTZ=ePTZ
+Capability.Function=PortMapping,ONVIF,Record,AlarmOutManual,ResolutionIndependent,AudioVolume,MFTest,TriggerMethodB
+Capability.Camera=SlowShutter,OSDTime,Mirror,Flip
+Capability.Remote.Event.Trigger.Enabled=YES
+Capability.Remote.Event.Trigger.Method=MOTION,ALARM,PIR,MOTION_PIR
+Capability.Mobile.Icon=ePTZ,AudioIn,ShutterLevel,S-,S+,AlarmOut
+
+
+===========================================================================================================================================
+GET /cgi-bin/nobody/Captcha.cgi?action=get&image=login_bmp HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Accept: */*
+Referer: http://192.168.0.158:88/
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: captcha=UQWca0arDfMYw; x=1; SSID=YWRtaW46YWRtaW4=; pbAudioFalg=ON; RESOLUTION=720P; MEDIA TYPE=H264; ReloWebTime=0; IdleTime=-62; LifeTime=0
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:27:20 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: image/bmp;
+Set-Cookie: captcha=CM.TsbeIQ/VTQ; path=/
+Content-Length: 11542
+
+BM.-......6...(....................,..................(..............................................................................
+
+<<< more data in one line >>>>>>
+
+
+===========================================================================================================================================
+POST /cgi-bin/guest/Login.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 22
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525586; IdleTime=15
+
+rnd=0.7624721846077591
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:41:34 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 487
+
+0
+OK
+Product-Name=H264IP_8126_305
+Product-ID=718
+Product-ID-Minor=AVM301
+Firmware-Version=1035-1024-1025-1008
+MAC-Address=00:0E:53:E8:7C:DA
+Host-Name=Surveillance
+User-Level=SUPERVISOR
+Life-Time=INFINITE
+Video-System=NTSC
+OEM-Name=301
+Device-Title=IPCAM
+Server-Language=ENGLISH
+Wizard-Auto=YES
+Properties-Option=Resolution_Independent
+USB-Storage=NO
+SD-Card=NO
+Video-NbrOfSources=1
+Audio-NbrOfSources=1
+Video-Default=H264
+Audio-DownloadFormat=ULAW
+DownloadSizeSupport=1
+DownloadMethod=2
+
+
+===========================================================================================================================================
+POST /cgi-bin/nobody/Machine.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 21
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; LifeTime=525586; ReloWebTime=5000; IdleTime=15
+
+action=get_capability
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:41:35 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 657
+
+0
+OK
+Firmware.Version=1035-1024-1025-1008
+MACAddress=00:0E:53:E8:7C:DA
+Product.Type=IPCAM
+Product.ID=AVM301
+Wizard.Auto=YES
+Properties.Option=Resolution_Independent
+USB.Storage=NO
+SD.Card=NO
+Video.System=NTSC
+Video.Input.Num=1
+Video.Output.Num=0
+Video.Format=H264,MPEG4,MJPEG
+Video.Format.Default=H264
+Video.Resolution=SXGA,HD720P,VGA,QVGA
+Video.Quality=BEST,HIGH,NORMAL,BASIC
+Video.Local.Input.Num=1
+Video.Local.Output.Num=0
+Video.Local.Format=H264,MPEG4,MJPEG
+Audio.Input.Num=1
+Audio.Output.Num=0
+Audio.Format=ULAW
+Audio.Local.Input.Num=1
+Audio.Local.Output.Num=0
+Audio.Local.Format=ULAW
+Language.Default=ENGLISH
+Language.Support=ENGLISH&CHINESE&SPANISH&
+
+
+===========================================================================================================================================
+POST /cgi-bin/nobody/Capability.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 10
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; LifeTime=525586; ReloWebTime=5000; IdleTime=15; RESOLUTION=720P
+
+action=get
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:41:36 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 1049
+
+0
+OK
+Device=IPCAM
+DeviceName=IPCAM (FIXED)
+ID=AVM301
+NetworkID=AVN305
+DeviceID=1
+Capability.HTTP.Port=88
+Capability.HTML.Timeout=15
+Capability.HTML.Config=YES
+Capability.Video.Input.Channel=1
+Capability.Video.Format=H264,MPEG4,MJPEG
+Capability.Video.Resolution=SXGA,HD720P,VGA,QVGA
+Capability.Video.Size=SXGA:1280x1024,HD720P:1280x720,VGA:640x480,QVGA:320x240
+Capability.Video.Framerate.Max=30
+Capability.Video.MotionArea=QVGA
+Capability.Video.TimeStamp=YES
+Capability.Video.MobileFormat=H264
+Capability.Mobile.Advance=YES
+Capability.Audio.Input.Channel=1
+Capability.Audio.Output.Channel=0
+Capability.Audio.Format=ULAW
+Capability.Peripherals=Memory,AudioIn,AlarmIn,AlarmOut,PIR,StatusLED
+Capability.PTZ=ePTZ
+Capability.Function=PortMapping,ONVIF,Record,AlarmOutManual,ResolutionIndependent,AudioVolume,MFTest,TriggerMethodB
+Capability.Camera=SlowShutter,OSDTime,Mirror,Flip
+Capability.Remote.Event.Trigger.Enabled=YES
+Capability.Remote.Event.Trigger.Method=MOTION,ALARM,PIR,MOTION_PIR
+Capability.Mobile.Icon=ePTZ,AudioIn,ShutterLevel,S-,S+,AlarmOut
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/IO.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 27
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; LifeTime=525586; ReloWebTime=5000; IdleTime=15; RESOLUTION=720P
+
+action=query&command=status
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:41:36 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 52
+
+0
+OK
+Input=0000000000000000
+Output=0000000000000000
+
+
+===========================================================================================================================================
+POST /cgi-bin/guest/UserInfo.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 12
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; LifeTime=525586; ReloWebTime=5000; IdleTime=15; RESOLUTION=720P
+
+action=query
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:41:36 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 35
+
+0
+OK
+Username=admin
+Password=admin
+
+
+===========================================================================================================================================
+POST /cgi-bin/nobody/Machine.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 20
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; LifeTime=525586; IdleTime=15; RESOLUTION=720P; ReloWebTime=0
+
+action=check_network
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:41:43 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 17
+
+0
+OK
+Internet=NO
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 29
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; LifeTime=525586; RESOLUTION=720P; ReloWebTime=0; IdleTime=15
+
+action=get&category=Account.*
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:41:50 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 298
+
+0
+OK
+Account.Maxuser=10
+Account.AnonymousLogin=DISABLE
+Account.LocalPassword=0000
+Account.Group.PermitList=LiveView;Configuration;Playback;
+Account.Group.NameList=Administrator
+Account.User1.Username=admin
+Account.User1.Password=admin
+Account.User1.Level=SUPERVISOR
+Account.User1.Lifetime=INFINITE
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 35
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; LifeTime=525586; RESOLUTION=720P; IdleTime=15; ReloWebTime=0
+
+action=get&category=Video.I0.H264.*
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:41:58 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 868
+
+0
+OK
+Video.I0.H264.ResolutionList=SXGA;HD720P;VGA;QVGA;QQVGA
+Video.I0.H264.Resolution=SXGA
+Video.I0.H264.Quality=BEST
+Video.I0.H264.RateCtrlMode=EVBR
+Video.I0.H264.MaxBitrate=5000
+Video.I0.H264.SXGA.Quality=BEST
+Video.I0.H264.SXGA.RateCtrlMode=EVBR
+Video.I0.H264.SXGA.MaxBitrate=5000
+Video.I0.H264.SXGA.Framerate=30
+Video.I0.H264.HD720P.Quality=BEST
+Video.I0.H264.HD720P.RateCtrlMode=EVBR
+Video.I0.H264.HD720P.MaxBitrate=5000
+Video.I0.H264.HD720P.Framerate=30
+Video.I0.H264.VGA.Quality=HIGH
+Video.I0.H264.VGA.RateCtrlMode=EVBR
+Video.I0.H264.VGA.MaxBitrate=3000
+Video.I0.H264.VGA.Framerate=30
+Video.I0.H264.QVGA.Quality=HIGH
+Video.I0.H264.QVGA.RateCtrlMode=EVBR
+Video.I0.H264.QVGA.MaxBitrate=3000
+Video.I0.H264.QVGA.Framerate=30
+Video.I0.H264.QQVGA.Quality=HIGH
+Video.I0.H264.QQVGA.RateCtrlMode=EVBR
+Video.I0.H264.QQVGA.MaxBitrate=3000
+Video.I0.H264.QQVGA.Framerate=30
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 42
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; LifeTime=525586; RESOLUTION=720P; IdleTime=15; ReloWebTime=0
+
+action=get&category=Video.I0.H264.HD720P.*
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:41:59 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 149
+
+0
+OK
+Video.I0.H264.HD720P.Quality=BEST
+Video.I0.H264.HD720P.RateCtrlMode=EVBR
+Video.I0.H264.HD720P.MaxBitrate=5000
+Video.I0.H264.HD720P.Framerate=30
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 35
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; LifeTime=525586; RESOLUTION=720P; IdleTime=15; ReloWebTime=0
+
+action=get&category=Camera.Record.*
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:41:59 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 2135
+
+0
+OK
+Camera.Record.Overwrite=NO
+Camera.Record.PreRecord=YES
+Camera.Record.Enable=OFF
+Camera.Record.Device.List=AUTO;RAMDISK
+Camera.Record.Device.Name=AUTO
+Camera.Record.Video.ResolutionList=SXGA;HD720P;VGA;QVGA
+Camera.Record.Video.Resolution=HD720P
+Camera.Record.Audio.Enable=OFF
+Camera.Record.List=Alarm;PIR
+Camera.Record.Manual.Enable=OFF
+Camera.Record.Manual.Time=600
+Camera.Record.Timer.Enable=OFF
+Camera.Record.Timer.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.Enable=OFF
+Camera.Record.Motion.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.Enable=ON
+Camera.Record.Alarm.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.Enable=ON
+Camera.Record.PIR.Time=10
+Camera.Record.PIR.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+
+
+===========================================================================================================================================
+OPTIONS rtsp://192.168.0.158:88/live/h264/HD720P RTSP/1.0
+CSeq: 1
+User-Agent: RealMedia Player Version 6.0.9.1235 (linux-2.0-libc6-i386-gcc2.95)
+ClientChallenge: 9e26d33f2984236010ef6253fb1887f7
+CompanyID: KnKV4M4I/B2FjJ1TToLycw==
+GUID: 00000000-0000-0000-0000-000000000000
+RegionData: 0
+PlayerStarttime: [28/03/2003:22:50:23 00:00]
+ClientID: Linux_2.4_6.0.9.1235_play32_RN01_EN_586
+Date: Wed, 30 Jan 2013 07:42:02 GMT
+
+RTSP/1.0 200 OK
+CSeq: 1
+Keep-Alive: timeout=10, max=1000
+Public: DESCRIBE, SETUP, TEARDOWN, PLAY, PAUSE, SET_PARAMETER
+Connection: Keep-Alive
+
+DESCRIBE rtsp://192.168.0.158:88/live/h264/HD720P RTSP/1.0
+CSeq: 2
+Accept: application/sdp
+Date: Wed, 30 Jan 2013 07:42:02 GMT
+
+RTSP/1.0 401 Unauthorized
+CSeq: 2
+WWW-Authenticate: Basic realm="Server"
+WWW-Authenticate: Digest realm="Server", nonce="51093f4797ce6fdd12832cb25a8b0603bc6b715a39a5b9255044e7e9ed35cf90"
+
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 29
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; LifeTime=525586; RESOLUTION=720P; ReloWebTime=0; IdleTime=15
+
+action=get&category=Network.*
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:42:11 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 7529
+
+0
+OK
+Network.BootProto=DHCP
+Network.IPAddress=192.168.0.158
+Network.Broadcast=192.168.1.255
+Network.DefaultRouter=192.168.0.254
+Network.SubnetMask=255.255.255.0
+Network.DNSServer1=168.95.1.1
+Network.DNSServer2=139.175.55.244
+Network.WebPort=88
+Network.DNSUpdate.Enabled=YES
+Network.DNSUpdate.Hostname=MAC000E53E87CDA
+Network.DNSUpdate.DNSName=default
+Network.SMTP.Port=25
+Network.SMTP.SSL=NO
+Network.SMTP.Authentication.Enabled=NO
+Network.FTP.Username=ftp
+Network.FTP.Password=1234
+Network.FTP.Port=21
+Network.FTP.Server=192.168.0.166
+Network.FTP.Directory=/home/ftp
+Network.SNTP.Period=0
+Network.SNTP.PeriodSecond=0
+Network.SNTP.GMT=57
+Network.SNTP.GMTOffset=480
+Network.SNTP.ServerName=tock.stdtime.gov.tw
+Network.SNTP.TimeZoneName=PST8PDT,M3.2.0/2,M11.1.0/2
+Network.eth0.MACAddress=00:0E:53:E8:7C:DA
+Network.Filter.ErrorCount=3
+Network.Filter.ErrorLocktime=0
+Network.Filter.ICMP8=ENABLE
+Network.Filter.Enabled=NO
+Network.Filter.Input.Policy=DENY
+Network.RTP.StartPort=50000
+Network.RTP.EndPort=60000
+Network.RTP.Multicast.Video.H264.ResolutionList=SXGA;HD720P;VGA;QVGA;QQVGA
+Network.RTP.Multicast.Video.H264.Address=239.101.101.101
+Network.RTP.Multicast.Video.H264.Port=9000
+Network.RTP.Multicast.Video.H264.HD720P.Address=239.101.101.102
+Network.RTP.Multicast.Video.H264.HD720P.Port=9000
+Network.RTP.Multicast.Video.H264.VGA.Address=239.101.101.103
+Network.RTP.Multicast.Video.H264.VGA.Port=9000
+Network.RTP.Multicast.Video.H264.QVGA.Address=239.101.101.104
+Network.RTP.Multicast.Video.H264.QVGA.Port=9000
+Network.RTP.Multicast.Video.H264.QQVGA.Address=239.101.101.105
+Network.RTP.Multicast.Video.H264.QQVGA.Port=9000
+Network.RTP.Multicast.Video.Mpeg4.ResolutionList=SXGA;HD720P;VGA;QVGA;QQVGA
+Network.RTP.Multicast.Video.Mpeg4.Address=239.101.102.101
+Network.RTP.Multicast.Video.Mpeg4.Port=9000
+Network.RTP.Multicast.Video.Mpeg4.HD720P.Address=239.101.102.102
+Network.RTP.Multicast.Video.Mpeg4.HD720P.Port=9000
+Network.RTP.Multicast.Video.Mpeg4.VGA.Address=239.101.102.103
+Network.RTP.Multicast.Video.Mpeg4.VGA.Port=9000
+Network.RTP.Multicast.Video.Mpeg4.QVGA.Address=239.101.102.104
+Network.RTP.Multicast.Video.Mpeg4.QVGA.Port=9000
+Network.RTP.Multicast.Video.Mpeg4.QQVGA.Address=239.101.102.105
+Network.RTP.Multicast.Video.Mpeg4.QQVGA.Port=9000
+Network.RTP.Multicast.Video.Jpeg.ResolutionList=SXGA;HD720P;VGA;QVGA;QQVGA
+Network.RTP.Multicast.Video.Jpeg.Address=239.101.103.101
+Network.RTP.Multicast.Video.Jpeg.Port=9000
+Network.RTP.Multicast.Video.Jpeg.HD720P.Address=239.101.103.102
+Network.RTP.Multicast.Video.Jpeg.HD720P.Port=9000
+Network.RTP.Multicast.Video.Jpeg.VGA.Address=239.101.103.103
+Network.RTP.Multicast.Video.Jpeg.VGA.Port=9000
+Network.RTP.Multicast.Video.Jpeg.QVGA.Address=239.101.103.104
+Network.RTP.Multicast.Video.Jpeg.QVGA.Port=9000
+Network.RTP.Multicast.Video.Jpeg.QQVGA.Address=239.101.103.105
+Network.RTP.Multicast.Video.Jpeg.QQVGA.Port=9000
+Network.RTP.Multicast.Audio.Address=239.101.104.101
+Network.RTP.Multicast.Audio.Port=9000
+Network.RTP.Multicast.TTL=15
+Network.RTSP.Enabled=YES
+Network.UPNP.Enabled=YES
+Network.UPNP.FriendlyName=IP CAMERA (Fixed) AVM301-000E53E87CDA
+Network.UPNP.Manufacturer=AVTECH Corporation.
+Network.UPNP.ManufacturerURL=http://www.avtech.com.tw/
+Network.UPNP.NATTraversal.Enabled=YES
+Network.UPNP.NATTraversal.HTTPPort=88
+Network.UPNP.NATTraversal.HTTPSPort=0
+Network.UPNP.NATTraversal.MinPort=32768
+Network.UPNP.NATTraversal.MaxPort=65535
+Network.ZeroConf.Enabled=NO
+Network.ZeroConf.SubnetMask=255.255.0.0
+Network.Bonjour.Enabled=YES
+Network.Bonjour.DeviceName=IP CAMERA (Fixed) AVM301-000E53E87CDA
+Network.HTML.Index=nobody/login.htm
+Network.HTML.Timeout=15
+Network.HTML.Config=YES
+Network.HTTPS.Port=443
+Network.HTTPS.CommonName=IP Address
+Network.HTTPS.OrganizationalUnitName=Unit Name
+Network.HTTPS.OrganizationName=Organization Name
+Network.HTTPS.LocalityName=City Name
+Network.HTTPS.ProvinceName=Province
+Network.HTTPS.CountryName=TW
+Network.HTTPS.PrivateKey=LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tDQpNSUlDZGdJQkFEQU5CZ2txaGtpRzl3MEJBUUVGQUFTQ0FtQXdnZ0pjQWdFQUFvR0JBTUJIeVBOa2tmL2g1aFMxDQpOenFkOE5oNy9MQVlVNndRM0d3MDBzZDFlN0dzdkE0U0h5eFAzNTR3TEVDSG9rWGFjS0xkZEtUdjZoakVOWisrDQpkYSs4NmhZNldQK2RNbEd1dHhsS0c2ZE5hckU3aDlMMU9CQk5GT1RuN3cwbHk1NWJ6aDFnK1B3cUtPRitVamFyDQo2QnVCS25udDFyemZkR3J6amNySTE4UkIzTXhOQWdNQkFBRUNnWUFyTjNjNURWK3JUWkN6RXMvcEF0ckJMWXpyDQozMnZlL3FNc1J1c2hIWXpCc0h0TUJsS3ZXUHgveDRBS3VQR0dGY1MvTmxzalB6RTBnOVV4cEZNN1BwQzJMaXZ6DQo3NEwzZ3ZsbnY0ZUZZYlFxY2ZvMG16aVF0VUVSb0tROXR6a0NqQ0J6RnpwTWx1dWMxQkU2VlFPQTJmbk1iRUwwDQpxTm9meHluWnU2eTNHM0RIbVFKQkFQRnk2UWZxVEJMTFZFSS9raEt3cGRhRTFwUHJJZWtWa3F0Q2JScnAwRDNqDQpoTkV2UTJsTXdoVjAyZnd2U2R0YUZKMFdxZDJobHJxSjlpSXZWNkhGeTA4Q1FRREwza3ppMEI3UGM5K1NBVENRDQpQZUgrZnY3dGJhem9aZk1BblBGUmYrMkU3THJXODBNSng5elJKQVVvdUlzUHJidnZEYlczb2wwdmYxazY1YkRhDQp3OWVqQWtFQW9Yb09hMkxBMmRqdVV4Z2M0eThNMmpraElQQWlUN1pEenhHdjBrNEpIVHJxZXRRM0sxZFFmZlVXDQpURmg3OXAxNko4MGVjY0UrQXlkOVcwTjZRaEQ4ZFFKQURsOGhkR3ZQZ0RoZTdsLy9HR3dFWG5oOWFDZHZKUUxxDQoyb1ExenRVQjNYa0N3dHhyUVdsQmU4emFRRUNpTFB6R1h0Zk1rNkZ5aUVLbCs2enRocjUvbVFKQVM3b0hPSXlkDQpFYUNkUEZKNllVNzVmYzQyMll2QkVIVjcwUmQzTnphN3VPclZXcGQ1NWdlTVpOUi9vRDJmNEM2aUxqS2UzdmdMDQpQUE5uZko5dGJuK2dSQT09DQotLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tDQo=
+Network.HTTPS.Certificate=LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tDQpNSUlDd0RDQ0FpbWdBd0lCQWdJSkFNckpwTVUyQnJlWE1BMEdDU3FHU0liM0RRRUJCUVVBTUhreEN6QUpCZ05WDQpCQVlUQWxSWE1SRXdEd1lEVlFRSURBaFFjbTkyYVc1alpURVNNQkFHQTFVRUJ3d0pRMmwwZVNCT1lXMWxNUm93DQpHQVlEVlFRS0RCRlBjbWRoYm1sNllYUnBiMjRnVG1GdFpURVNNQkFHQTFVRUN3d0pWVzVwZENCT1lXMWxNUk13DQpFUVlEVlFRRERBcEpVQ0JCWkdSeVpYTnpNQjRYRFRFd01EZ3hPREUzTVRnME1Gb1hEVEl3TURneE5URTNNVGcwDQpNRm93ZVRFTE1Ba0dBMVVFQmhNQ1ZGY3hFVEFQQmdOVkJBZ01DRkJ5YjNacGJtTmxNUkl3RUFZRFZRUUhEQWxEDQphWFI1SUU1aGJXVXhHakFZQmdOVkJBb01FVTl5WjJGdWFYcGhkR2x2YmlCT1lXMWxNUkl3RUFZRFZRUUxEQWxWDQpibWwwSUU1aGJXVXhFekFSQmdOVkJBTU1Da2xRSUVGa1pISmxjM013Z1o4d0RRWUpLb1pJaHZjTkFRRUJCUUFEDQpnWTBBTUlHSkFvR0JBTUJIeVBOa2tmL2g1aFMxTnpxZDhOaDcvTEFZVTZ3UTNHdzAwc2QxZTdHc3ZBNFNIeXhQDQozNTR3TEVDSG9rWGFjS0xkZEtUdjZoakVOWisrZGErODZoWTZXUCtkTWxHdXR4bEtHNmROYXJFN2g5TDFPQkJODQpGT1RuN3cwbHk1NWJ6aDFnK1B3cUtPRitVamFyNkJ1QktubnQxcnpmZEdyempjckkxOFJCM014TkFnTUJBQUdqDQpVREJPTUIwR0ExVWREZ1FXQkJTcUxhaHdyQ01IQVhrT2RUSGRnVVJxNDZXa2tqQWZCZ05WSFNNRUdEQVdnQlNxDQpMYWh3ckNNSEFYa09kVEhkZ1VScTQ2V2trakFNQmdOVkhSTUVCVEFEQVFIL01BMEdDU3FHU0liM0RRRUJCUVVBDQpBNEdCQUp2aXhFdTZzQ20wZTBPMFhVMXZ6QWVsNTdSR2dOajFON3MxSTUyMndUUkdleXpaWnpOdmxJSE1tak5MDQpYeGlsSXBqM1gzT04vK0doM0pwYU1LNC9SQUovL2dBSzhaaWIxRVJYbDBsM0x2T25ycGcyNWw2b00wYmdEYTg0DQo3dG5YalZqcGppMXkvNG43S0YybDhXV0dOa1pjSWMzRGdmTW55LzVGeGRkeHNkL3UNCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0NCg==
+Network.NAT.Enabled=NO
+Network.NAT.SyncDDNS=YES
+Network.NAT.Hostname=MAC000E53E87CDA
+Network.NAT.FirstUse=NO
+Network.WIFI.Enabled=YES
+Network.WIFI.BootProto=DHCP
+Network.WIFI.IPAddress=192.168.2.10
+Network.WIFI.SubnetMask=255.255.255.0
+Network.WIFI.DefaultRouter=192.168.2.254
+Network.WIFI.Profile.Default=1
+Network.WIFI.Profile.Max=10
+Network.WIFI.Profile.Used=2
+Network.WIFI.AP1.ProfileName=Default_ProfileName
+Network.WIFI.AP1.NetworkType=Adhoc
+Network.WIFI.AP1.AuthMode=OPEN
+Network.WIFI.AP1.EncrypType=NONE
+Network.WIFI.AP1.SSID=IP-CAMERA
+Network.WIFI.AP1.CHANNEL=1
+Network.WIFI.AP1.AdhocOfdm=1
+Network.WIFI.AP2.ProfileName=WPS_ProfileName
+Network.QOS.Enabled=NO
+Network.QOS.Device=eth0
+Network.QOS.Interface=eth0
+Network.QOS.MaxUploadRate=4096
+Network.SMS.System=clickatell
+Network.SMS.SystemList=clickatell;EVERY8D
+Network.SMS.Encryption=base64
+Network.SMS.Interval=15
+Network.SMS.AddDomainName=NO
+Network.SMS.SendType=SMS
+Network.MODEM.Enabled=NO
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 45
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; LifeTime=525586; RESOLUTION=720P; ReloWebTime=0; IdleTime=15
+
+action=get&protocol=static&category=Network.*
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:42:11 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 7528
+
+0
+OK
+Network.BootProto=DHCP
+Network.IPAddress=192.168.1.10
+Network.Broadcast=192.168.1.255
+Network.DefaultRouter=192.168.0.254
+Network.SubnetMask=255.255.255.0
+Network.DNSServer1=168.95.1.1
+Network.DNSServer2=139.175.55.244
+Network.WebPort=88
+Network.DNSUpdate.Enabled=YES
+Network.DNSUpdate.Hostname=MAC000E53E87CDA
+Network.DNSUpdate.DNSName=default
+Network.SMTP.Port=25
+Network.SMTP.SSL=NO
+Network.SMTP.Authentication.Enabled=NO
+Network.FTP.Username=ftp
+Network.FTP.Password=1234
+Network.FTP.Port=21
+Network.FTP.Server=192.168.0.166
+Network.FTP.Directory=/home/ftp
+Network.SNTP.Period=0
+Network.SNTP.PeriodSecond=0
+Network.SNTP.GMT=57
+Network.SNTP.GMTOffset=480
+Network.SNTP.ServerName=tock.stdtime.gov.tw
+Network.SNTP.TimeZoneName=PST8PDT,M3.2.0/2,M11.1.0/2
+Network.eth0.MACAddress=00:0E:53:E8:7C:DA
+Network.Filter.ErrorCount=3
+Network.Filter.ErrorLocktime=0
+Network.Filter.ICMP8=ENABLE
+Network.Filter.Enabled=NO
+Network.Filter.Input.Policy=DENY
+Network.RTP.StartPort=50000
+Network.RTP.EndPort=60000
+Network.RTP.Multicast.Video.H264.ResolutionList=SXGA;HD720P;VGA;QVGA;QQVGA
+Network.RTP.Multicast.Video.H264.Address=239.101.101.101
+Network.RTP.Multicast.Video.H264.Port=9000
+Network.RTP.Multicast.Video.H264.HD720P.Address=239.101.101.102
+Network.RTP.Multicast.Video.H264.HD720P.Port=9000
+Network.RTP.Multicast.Video.H264.VGA.Address=239.101.101.103
+Network.RTP.Multicast.Video.H264.VGA.Port=9000
+Network.RTP.Multicast.Video.H264.QVGA.Address=239.101.101.104
+Network.RTP.Multicast.Video.H264.QVGA.Port=9000
+Network.RTP.Multicast.Video.H264.QQVGA.Address=239.101.101.105
+Network.RTP.Multicast.Video.H264.QQVGA.Port=9000
+Network.RTP.Multicast.Video.Mpeg4.ResolutionList=SXGA;HD720P;VGA;QVGA;QQVGA
+Network.RTP.Multicast.Video.Mpeg4.Address=239.101.102.101
+Network.RTP.Multicast.Video.Mpeg4.Port=9000
+Network.RTP.Multicast.Video.Mpeg4.HD720P.Address=239.101.102.102
+Network.RTP.Multicast.Video.Mpeg4.HD720P.Port=9000
+Network.RTP.Multicast.Video.Mpeg4.VGA.Address=239.101.102.103
+Network.RTP.Multicast.Video.Mpeg4.VGA.Port=9000
+Network.RTP.Multicast.Video.Mpeg4.QVGA.Address=239.101.102.104
+Network.RTP.Multicast.Video.Mpeg4.QVGA.Port=9000
+Network.RTP.Multicast.Video.Mpeg4.QQVGA.Address=239.101.102.105
+Network.RTP.Multicast.Video.Mpeg4.QQVGA.Port=9000
+Network.RTP.Multicast.Video.Jpeg.ResolutionList=SXGA;HD720P;VGA;QVGA;QQVGA
+Network.RTP.Multicast.Video.Jpeg.Address=239.101.103.101
+Network.RTP.Multicast.Video.Jpeg.Port=9000
+Network.RTP.Multicast.Video.Jpeg.HD720P.Address=239.101.103.102
+Network.RTP.Multicast.Video.Jpeg.HD720P.Port=9000
+Network.RTP.Multicast.Video.Jpeg.VGA.Address=239.101.103.103
+Network.RTP.Multicast.Video.Jpeg.VGA.Port=9000
+Network.RTP.Multicast.Video.Jpeg.QVGA.Address=239.101.103.104
+Network.RTP.Multicast.Video.Jpeg.QVGA.Port=9000
+Network.RTP.Multicast.Video.Jpeg.QQVGA.Address=239.101.103.105
+Network.RTP.Multicast.Video.Jpeg.QQVGA.Port=9000
+Network.RTP.Multicast.Audio.Address=239.101.104.101
+Network.RTP.Multicast.Audio.Port=9000
+Network.RTP.Multicast.TTL=15
+Network.RTSP.Enabled=YES
+Network.UPNP.Enabled=YES
+Network.UPNP.FriendlyName=IP CAMERA (Fixed) AVM301-000E53E87CDA
+Network.UPNP.Manufacturer=AVTECH Corporation.
+Network.UPNP.ManufacturerURL=http://www.avtech.com.tw/
+Network.UPNP.NATTraversal.Enabled=YES
+Network.UPNP.NATTraversal.HTTPPort=88
+Network.UPNP.NATTraversal.HTTPSPort=0
+Network.UPNP.NATTraversal.MinPort=32768
+Network.UPNP.NATTraversal.MaxPort=65535
+Network.ZeroConf.Enabled=NO
+Network.ZeroConf.SubnetMask=255.255.0.0
+Network.Bonjour.Enabled=YES
+Network.Bonjour.DeviceName=IP CAMERA (Fixed) AVM301-000E53E87CDA
+Network.HTML.Index=nobody/login.htm
+Network.HTML.Timeout=15
+Network.HTML.Config=YES
+Network.HTTPS.Port=443
+Network.HTTPS.CommonName=IP Address
+Network.HTTPS.OrganizationalUnitName=Unit Name
+Network.HTTPS.OrganizationName=Organization Name
+Network.HTTPS.LocalityName=City Name
+Network.HTTPS.ProvinceName=Province
+Network.HTTPS.CountryName=TW
+Network.HTTPS.PrivateKey=LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tDQpNSUlDZGdJQkFEQU5CZ2txaGtpRzl3MEJBUUVGQUFTQ0FtQXdnZ0pjQWdFQUFvR0JBTUJIeVBOa2tmL2g1aFMxDQpOenFkOE5oNy9MQVlVNndRM0d3MDBzZDFlN0dzdkE0U0h5eFAzNTR3TEVDSG9rWGFjS0xkZEtUdjZoakVOWisrDQpkYSs4NmhZNldQK2RNbEd1dHhsS0c2ZE5hckU3aDlMMU9CQk5GT1RuN3cwbHk1NWJ6aDFnK1B3cUtPRitVamFyDQo2QnVCS25udDFyemZkR3J6amNySTE4UkIzTXhOQWdNQkFBRUNnWUFyTjNjNURWK3JUWkN6RXMvcEF0ckJMWXpyDQozMnZlL3FNc1J1c2hIWXpCc0h0TUJsS3ZXUHgveDRBS3VQR0dGY1MvTmxzalB6RTBnOVV4cEZNN1BwQzJMaXZ6DQo3NEwzZ3ZsbnY0ZUZZYlFxY2ZvMG16aVF0VUVSb0tROXR6a0NqQ0J6RnpwTWx1dWMxQkU2VlFPQTJmbk1iRUwwDQpxTm9meHluWnU2eTNHM0RIbVFKQkFQRnk2UWZxVEJMTFZFSS9raEt3cGRhRTFwUHJJZWtWa3F0Q2JScnAwRDNqDQpoTkV2UTJsTXdoVjAyZnd2U2R0YUZKMFdxZDJobHJxSjlpSXZWNkhGeTA4Q1FRREwza3ppMEI3UGM5K1NBVENRDQpQZUgrZnY3dGJhem9aZk1BblBGUmYrMkU3THJXODBNSng5elJKQVVvdUlzUHJidnZEYlczb2wwdmYxazY1YkRhDQp3OWVqQWtFQW9Yb09hMkxBMmRqdVV4Z2M0eThNMmpraElQQWlUN1pEenhHdjBrNEpIVHJxZXRRM0sxZFFmZlVXDQpURmg3OXAxNko4MGVjY0UrQXlkOVcwTjZRaEQ4ZFFKQURsOGhkR3ZQZ0RoZTdsLy9HR3dFWG5oOWFDZHZKUUxxDQoyb1ExenRVQjNYa0N3dHhyUVdsQmU4emFRRUNpTFB6R1h0Zk1rNkZ5aUVLbCs2enRocjUvbVFKQVM3b0hPSXlkDQpFYUNkUEZKNllVNzVmYzQyMll2QkVIVjcwUmQzTnphN3VPclZXcGQ1NWdlTVpOUi9vRDJmNEM2aUxqS2UzdmdMDQpQUE5uZko5dGJuK2dSQT09DQotLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tDQo=
+Network.HTTPS.Certificate=LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tDQpNSUlDd0RDQ0FpbWdBd0lCQWdJSkFNckpwTVUyQnJlWE1BMEdDU3FHU0liM0RRRUJCUVVBTUhreEN6QUpCZ05WDQpCQVlUQWxSWE1SRXdEd1lEVlFRSURBaFFjbTkyYVc1alpURVNNQkFHQTFVRUJ3d0pRMmwwZVNCT1lXMWxNUm93DQpHQVlEVlFRS0RCRlBjbWRoYm1sNllYUnBiMjRnVG1GdFpURVNNQkFHQTFVRUN3d0pWVzVwZENCT1lXMWxNUk13DQpFUVlEVlFRRERBcEpVQ0JCWkdSeVpYTnpNQjRYRFRFd01EZ3hPREUzTVRnME1Gb1hEVEl3TURneE5URTNNVGcwDQpNRm93ZVRFTE1Ba0dBMVVFQmhNQ1ZGY3hFVEFQQmdOVkJBZ01DRkJ5YjNacGJtTmxNUkl3RUFZRFZRUUhEQWxEDQphWFI1SUU1aGJXVXhHakFZQmdOVkJBb01FVTl5WjJGdWFYcGhkR2x2YmlCT1lXMWxNUkl3RUFZRFZRUUxEQWxWDQpibWwwSUU1aGJXVXhFekFSQmdOVkJBTU1Da2xRSUVGa1pISmxjM013Z1o4d0RRWUpLb1pJaHZjTkFRRUJCUUFEDQpnWTBBTUlHSkFvR0JBTUJIeVBOa2tmL2g1aFMxTnpxZDhOaDcvTEFZVTZ3UTNHdzAwc2QxZTdHc3ZBNFNIeXhQDQozNTR3TEVDSG9rWGFjS0xkZEtUdjZoakVOWisrZGErODZoWTZXUCtkTWxHdXR4bEtHNmROYXJFN2g5TDFPQkJODQpGT1RuN3cwbHk1NWJ6aDFnK1B3cUtPRitVamFyNkJ1QktubnQxcnpmZEdyempjckkxOFJCM014TkFnTUJBQUdqDQpVREJPTUIwR0ExVWREZ1FXQkJTcUxhaHdyQ01IQVhrT2RUSGRnVVJxNDZXa2tqQWZCZ05WSFNNRUdEQVdnQlNxDQpMYWh3ckNNSEFYa09kVEhkZ1VScTQ2V2trakFNQmdOVkhSTUVCVEFEQVFIL01BMEdDU3FHU0liM0RRRUJCUVVBDQpBNEdCQUp2aXhFdTZzQ20wZTBPMFhVMXZ6QWVsNTdSR2dOajFON3MxSTUyMndUUkdleXpaWnpOdmxJSE1tak5MDQpYeGlsSXBqM1gzT04vK0doM0pwYU1LNC9SQUovL2dBSzhaaWIxRVJYbDBsM0x2T25ycGcyNWw2b00wYmdEYTg0DQo3dG5YalZqcGppMXkvNG43S0YybDhXV0dOa1pjSWMzRGdmTW55LzVGeGRkeHNkL3UNCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0NCg==
+Network.NAT.Enabled=NO
+Network.NAT.SyncDDNS=YES
+Network.NAT.Hostname=MAC000E53E87CDA
+Network.NAT.FirstUse=NO
+Network.WIFI.Enabled=YES
+Network.WIFI.BootProto=DHCP
+Network.WIFI.IPAddress=192.168.2.10
+Network.WIFI.SubnetMask=255.255.255.0
+Network.WIFI.DefaultRouter=192.168.2.254
+Network.WIFI.Profile.Default=1
+Network.WIFI.Profile.Max=10
+Network.WIFI.Profile.Used=2
+Network.WIFI.AP1.ProfileName=Default_ProfileName
+Network.WIFI.AP1.NetworkType=Adhoc
+Network.WIFI.AP1.AuthMode=OPEN
+Network.WIFI.AP1.EncrypType=NONE
+Network.WIFI.AP1.SSID=IP-CAMERA
+Network.WIFI.AP1.CHANNEL=1
+Network.WIFI.AP1.AdhocOfdm=1
+Network.WIFI.AP2.ProfileName=WPS_ProfileName
+Network.QOS.Enabled=NO
+Network.QOS.Device=eth0
+Network.QOS.Interface=eth0
+Network.QOS.MaxUploadRate=4096
+Network.SMS.System=clickatell
+Network.SMS.SystemList=clickatell;EVERY8D
+Network.SMS.Encryption=base64
+Network.SMS.Interval=15
+Network.SMS.AddDomainName=NO
+Network.SMS.SendType=SMS
+Network.MODEM.Enabled=NO
+
+
+===========================================================================================================================================
+POST /cgi-bin/supervisor/QOS.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 10
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; LifeTime=525586; RESOLUTION=720P; ReloWebTime=0; IdleTime=15
+
+action=get
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:42:24 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 110
+
+0
+OK
+Network.QOS.Enabled=NO
+Network.QOS.Device=eth0
+Network.QOS.Interface=eth0
+Network.QOS.MaxUploadRate=4096
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 39
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; LifeTime=525586; RESOLUTION=720P; ReloWebTime=0; IdleTime=15
+
+action=get&category=Network.DNSUpdate.*
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:42:32 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 112
+
+0
+OK
+Network.DNSUpdate.Enabled=YES
+Network.DNSUpdate.Hostname=MAC000E53E87CDA
+Network.DNSUpdate.DNSName=default
+
+
+===========================================================================================================================================
+POST /cgi-bin/supervisor/DDns.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 32
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; LifeTime=525586; RESOLUTION=720P; ReloWebTime=0; IdleTime=15
+
+action=get_email&dnsname=default
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:42:50 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 8
+
+0
+OK
+ss
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 34
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525585; IdleTime=14
+
+action=get&category=Network.SNTP.*
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:42:35 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 199
+
+0
+OK
+Network.SNTP.Period=0
+Network.SNTP.PeriodSecond=0
+Network.SNTP.GMT=57
+Network.SNTP.GMTOffset=480
+Network.SNTP.ServerName=tock.stdtime.gov.tw
+Network.SNTP.TimeZoneName=PST8PDT,M3.2.0/2,M11.1.0/2
+
+
+===========================================================================================================================================
+POST /cgi-bin/guest/Time.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 10
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525585; IdleTime=14
+
+action=get
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:42:35 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 29
+
+0
+OK
+2013/01/30 Wed 15:42:35
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 34
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525585; IdleTime=15
+
+action=get&category=Network.SNTP.*
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:42:46 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 199
+
+0
+OK
+Network.SNTP.Period=0
+Network.SNTP.PeriodSecond=0
+Network.SNTP.GMT=57
+Network.SNTP.GMTOffset=480
+Network.SNTP.ServerName=tock.stdtime.gov.tw
+Network.SNTP.TimeZoneName=PST8PDT,M3.2.0/2,M11.1.0/2
+
+
+===========================================================================================================================================
+POST /cgi-bin/guest/Time.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 10
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525585; IdleTime=15
+
+action=get
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:42:46 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 29
+
+0
+OK
+2013/01/30 Wed 15:42:46
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 33
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525585; IdleTime=15
+
+action=get&category=Network.FTP.*
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:42:50 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 141
+
+0
+OK
+Network.FTP.Username=ftp
+Network.FTP.Password=1234
+Network.FTP.Port=21
+Network.FTP.Server=192.168.0.166
+Network.FTP.Directory=/home/ftp
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 150
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525585; IdleTime=15
+
+action=set&Network.FTP.Username=ftp&Network.FTP.Password=1234&Network.FTP.Port=21&Network.FTP.Server=192.168.0.161&Network.FTP.Directory=%2fhome%2fftp
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:42:59 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 5
+
+0
+OK
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 150
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525585; IdleTime=15
+
+action=set&Network.FTP.Username=ftp&Network.FTP.Password=1234&Network.FTP.Port=21&Network.FTP.Server=192.168.0.161&Network.FTP.Directory=%2fhome%2fftp
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:43:02 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 5
+
+0
+OK
+
+
+===========================================================================================================================================
+POST /cgi-bin/nobody/Machine.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 15
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525585; IdleTime=15
+
+action=test_ftp
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:43:03 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 5
+
+0
+OK
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 34
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525585; IdleTime=15
+
+action=get&category=Network.SMTP.*
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:43:08 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 85
+
+0
+OK
+Network.SMTP.Port=25
+Network.SMTP.SSL=NO
+Network.SMTP.Authentication.Enabled=NO
+
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 36
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525585; IdleTime=15
+
+action=get&category=Network.Filter.*
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:43:15 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 151
+
+0
+OK
+Network.Filter.ErrorCount=3
+Network.Filter.ErrorLocktime=0
+Network.Filter.ICMP8=ENABLE
+Network.Filter.Enabled=NO
+Network.Filter.Input.Policy=DENY
+
+
+
+===========================================================================================================================================
+POST /cgi-bin/guest/UserInfo.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 14
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525585; IdleTime=15
+
+action=checkip
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:43:15 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 25
+
+0
+OK
+192.168.0.161:14298
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 34
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525585; IdleTime=15
+
+action=get&category=Network.UPNP.*
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:43:18 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 389
+
+0
+OK
+Network.UPNP.Enabled=YES
+Network.UPNP.FriendlyName=IP CAMERA (Fixed) AVM301-000E53E87CDA
+Network.UPNP.Manufacturer=AVTECH Corporation.
+Network.UPNP.ManufacturerURL=http://www.avtech.com.tw/
+Network.UPNP.NATTraversal.Enabled=YES
+Network.UPNP.NATTraversal.HTTPPort=88
+Network.UPNP.NATTraversal.HTTPSPort=0
+Network.UPNP.NATTraversal.MinPort=32768
+Network.UPNP.NATTraversal.MaxPort=65535
+
+
+===========================================================================================================================================
+POST /cgi-bin/supervisor/PortMapping.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 12
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525585; IdleTime=15
+
+action=query
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:44:11 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 71
+
+-78
+ERROR: Get the connection type and the external IP address failed.
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 37
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525585; IdleTime=15
+
+action=get&category=Network.Bonjour.*
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:43:24 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 98
+
+0
+OK
+Network.Bonjour.Enabled=YES
+Network.Bonjour.DeviceName=IP CAMERA (Fixed) AVM301-000E53E87CDA
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 35
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525585; IdleTime=15
+
+action=get&category=Camera.System.*
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:43:27 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 451
+
+0
+OK
+Camera.System.ID=1
+Camera.System.Display=ALL
+Camera.System.DisplayZoomRatio=ON
+Camera.System.Title=IPCAM
+Camera.System.Position=D-R
+Camera.System.Timeout=0
+Camera.System.IsTiltUpLimit=YES
+Camera.System.TurboStep=5
+Camera.System.Baudrate=2400
+Camera.System.IsAuto=NO
+Camera.System.IsAutoTracking=NO
+Camera.System.LocalControl=ENABLE
+Camera.System.Speed.Pan=30
+Camera.System.Speed.Tilt=30
+Camera.System.Speed.Zoom=128
+Camera.System.Speed.Focus=128
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 30
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525585; IdleTime=15
+
+action=get&category=Video.I0.*
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:43:30 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 2673
+
+0
+OK
+Video.I0.Brightness=50
+Video.I0.BrightnessDefault=50
+Video.I0.BrightnessMax=100
+Video.I0.BrightnessMin=0
+Video.I0.Contrast=55
+Video.I0.ContrastDefault=55
+Video.I0.ContrastMax=100
+Video.I0.ContrastMin=0
+Video.I0.Saturation=65
+Video.I0.SaturationDefault=65
+Video.I0.SaturationMax=100
+Video.I0.SaturationMin=0
+Video.I0.Hue=50
+Video.I0.HueDefault=50
+Video.I0.HueMax=100
+Video.I0.HueMin=0
+Video.I0.System=NTSC
+Video.I0.PowerLineFrequency=60
+Video.I0.Framerate=0
+Video.I0.FramerateMax=30
+Video.I0.Jpeg.ResolutionList=SXGA;HD720P;VGA;QVGA;QQVGA
+Video.I0.Jpeg.Resolution=SXGA
+Video.I0.Jpeg.Quality=HIGH
+Video.I0.Jpeg.SXGA.Quality=BEST
+Video.I0.Jpeg.SXGA.Framerate=8
+Video.I0.Jpeg.HD720P.Quality=BEST
+Video.I0.Jpeg.HD720P.Framerate=8
+Video.I0.Jpeg.VGA.Quality=HIGH
+Video.I0.Jpeg.VGA.Framerate=30
+Video.I0.Jpeg.QVGA.Quality=HIGH
+Video.I0.Jpeg.QVGA.Framerate=30
+Video.I0.Jpeg.QQVGA.Quality=HIGH
+Video.I0.Jpeg.QQVGA.Framerate=30
+Video.I0.Mpeg4.ResolutionList=SXGA;HD720P;VGA;QVGA;QQVGA
+Video.I0.Mpeg4.Resolution=SXGA
+Video.I0.Mpeg4.Quality=HIGH
+Video.I0.Mpeg4.RateCtrlMode=EVBR
+Video.I0.Mpeg4.MaxBitrate=5000
+Video.I0.Mpeg4.SXGA.Quality=HIGH
+Video.I0.Mpeg4.SXGA.RateCtrlMode=EVBR
+Video.I0.Mpeg4.SXGA.MaxBitrate=5000
+Video.I0.Mpeg4.SXGA.Framerate=20
+Video.I0.Mpeg4.HD720P.Quality=HIGH
+Video.I0.Mpeg4.HD720P.RateCtrlMode=EVBR
+Video.I0.Mpeg4.HD720P.MaxBitrate=5000
+Video.I0.Mpeg4.HD720P.Framerate=20
+Video.I0.Mpeg4.VGA.Quality=HIGH
+Video.I0.Mpeg4.VGA.RateCtrlMode=EVBR
+Video.I0.Mpeg4.VGA.MaxBitrate=3000
+Video.I0.Mpeg4.VGA.Framerate=30
+Video.I0.Mpeg4.QVGA.Quality=HIGH
+Video.I0.Mpeg4.QVGA.RateCtrlMode=EVBR
+Video.I0.Mpeg4.QVGA.MaxBitrate=3000
+Video.I0.Mpeg4.QVGA.Framerate=30
+Video.I0.Mpeg4.QQVGA.Quality=HIGH
+Video.I0.Mpeg4.QQVGA.RateCtrlMode=EVBR
+Video.I0.Mpeg4.QQVGA.MaxBitrate=3000
+Video.I0.Mpeg4.QQVGA.Framerate=30
+Video.I0.H264.ResolutionList=SXGA;HD720P;VGA;QVGA;QQVGA
+Video.I0.H264.Resolution=SXGA
+Video.I0.H264.Quality=BEST
+Video.I0.H264.RateCtrlMode=EVBR
+Video.I0.H264.MaxBitrate=5000
+Video.I0.H264.SXGA.Quality=BEST
+Video.I0.H264.SXGA.RateCtrlMode=EVBR
+Video.I0.H264.SXGA.MaxBitrate=5000
+Video.I0.H264.SXGA.Framerate=30
+Video.I0.H264.HD720P.Quality=BEST
+Video.I0.H264.HD720P.RateCtrlMode=EVBR
+Video.I0.H264.HD720P.MaxBitrate=5000
+Video.I0.H264.HD720P.Framerate=30
+Video.I0.H264.VGA.Quality=HIGH
+Video.I0.H264.VGA.RateCtrlMode=EVBR
+Video.I0.H264.VGA.MaxBitrate=3000
+Video.I0.H264.VGA.Framerate=30
+Video.I0.H264.QVGA.Quality=HIGH
+Video.I0.H264.QVGA.RateCtrlMode=EVBR
+Video.I0.H264.QVGA.MaxBitrate=3000
+Video.I0.H264.QVGA.Framerate=30
+Video.I0.H264.QQVGA.Quality=HIGH
+Video.I0.H264.QQVGA.RateCtrlMode=EVBR
+Video.I0.H264.QQVGA.MaxBitrate=3000
+Video.I0.H264.QQVGA.Framerate=30
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 30
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525585; IdleTime=15
+
+action=get&category=Video.I0.*
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:43:33 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 2673
+
+0
+OK
+Video.I0.Brightness=50
+Video.I0.BrightnessDefault=50
+Video.I0.BrightnessMax=100
+Video.I0.BrightnessMin=0
+Video.I0.Contrast=55
+Video.I0.ContrastDefault=55
+Video.I0.ContrastMax=100
+Video.I0.ContrastMin=0
+Video.I0.Saturation=65
+Video.I0.SaturationDefault=65
+Video.I0.SaturationMax=100
+Video.I0.SaturationMin=0
+Video.I0.Hue=50
+Video.I0.HueDefault=50
+Video.I0.HueMax=100
+Video.I0.HueMin=0
+Video.I0.System=NTSC
+Video.I0.PowerLineFrequency=60
+Video.I0.Framerate=0
+Video.I0.FramerateMax=30
+Video.I0.Jpeg.ResolutionList=SXGA;HD720P;VGA;QVGA;QQVGA
+Video.I0.Jpeg.Resolution=SXGA
+Video.I0.Jpeg.Quality=HIGH
+Video.I0.Jpeg.SXGA.Quality=BEST
+Video.I0.Jpeg.SXGA.Framerate=8
+Video.I0.Jpeg.HD720P.Quality=BEST
+Video.I0.Jpeg.HD720P.Framerate=8
+Video.I0.Jpeg.VGA.Quality=HIGH
+Video.I0.Jpeg.VGA.Framerate=30
+Video.I0.Jpeg.QVGA.Quality=HIGH
+Video.I0.Jpeg.QVGA.Framerate=30
+Video.I0.Jpeg.QQVGA.Quality=HIGH
+Video.I0.Jpeg.QQVGA.Framerate=30
+Video.I0.Mpeg4.ResolutionList=SXGA;HD720P;VGA;QVGA;QQVGA
+Video.I0.Mpeg4.Resolution=SXGA
+Video.I0.Mpeg4.Quality=HIGH
+Video.I0.Mpeg4.RateCtrlMode=EVBR
+Video.I0.Mpeg4.MaxBitrate=5000
+Video.I0.Mpeg4.SXGA.Quality=HIGH
+Video.I0.Mpeg4.SXGA.RateCtrlMode=EVBR
+Video.I0.Mpeg4.SXGA.MaxBitrate=5000
+Video.I0.Mpeg4.SXGA.Framerate=20
+Video.I0.Mpeg4.HD720P.Quality=HIGH
+Video.I0.Mpeg4.HD720P.RateCtrlMode=EVBR
+Video.I0.Mpeg4.HD720P.MaxBitrate=5000
+Video.I0.Mpeg4.HD720P.Framerate=20
+Video.I0.Mpeg4.VGA.Quality=HIGH
+Video.I0.Mpeg4.VGA.RateCtrlMode=EVBR
+Video.I0.Mpeg4.VGA.MaxBitrate=3000
+Video.I0.Mpeg4.VGA.Framerate=30
+Video.I0.Mpeg4.QVGA.Quality=HIGH
+Video.I0.Mpeg4.QVGA.RateCtrlMode=EVBR
+Video.I0.Mpeg4.QVGA.MaxBitrate=3000
+Video.I0.Mpeg4.QVGA.Framerate=30
+Video.I0.Mpeg4.QQVGA.Quality=HIGH
+Video.I0.Mpeg4.QQVGA.RateCtrlMode=EVBR
+Video.I0.Mpeg4.QQVGA.MaxBitrate=3000
+Video.I0.Mpeg4.QQVGA.Framerate=30
+Video.I0.H264.ResolutionList=SXGA;HD720P;VGA;QVGA;QQVGA
+Video.I0.H264.Resolution=SXGA
+Video.I0.H264.Quality=BEST
+Video.I0.H264.RateCtrlMode=EVBR
+Video.I0.H264.MaxBitrate=5000
+Video.I0.H264.SXGA.Quality=BEST
+Video.I0.H264.SXGA.RateCtrlMode=EVBR
+Video.I0.H264.SXGA.MaxBitrate=5000
+Video.I0.H264.SXGA.Framerate=30
+Video.I0.H264.HD720P.Quality=BEST
+Video.I0.H264.HD720P.RateCtrlMode=EVBR
+Video.I0.H264.HD720P.MaxBitrate=5000
+Video.I0.H264.HD720P.Framerate=30
+Video.I0.H264.VGA.Quality=HIGH
+Video.I0.H264.VGA.RateCtrlMode=EVBR
+Video.I0.H264.VGA.MaxBitrate=3000
+Video.I0.H264.VGA.Framerate=30
+Video.I0.H264.QVGA.Quality=HIGH
+Video.I0.H264.QVGA.RateCtrlMode=EVBR
+Video.I0.H264.QVGA.MaxBitrate=3000
+Video.I0.H264.QVGA.Framerate=30
+Video.I0.H264.QQVGA.Quality=HIGH
+Video.I0.H264.QQVGA.RateCtrlMode=EVBR
+Video.I0.H264.QQVGA.MaxBitrate=3000
+Video.I0.H264.QQVGA.Framerate=30
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 27
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525584; IdleTime=15
+
+action=get&category=Audio.*
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:43:40 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 262
+
+0
+OK
+Audio.Input.Volume.Max=10
+Audio.Input.Volume.Min=1
+Audio.Input.Volume.Value=5
+Audio.Input.Volume.Default=5
+Audio.Input.Mute=0
+Audio.Output.Volume.Max=10
+Audio.Output.Volume.Min=1
+Audio.Output.Volume.Value=5
+Audio.Output.Volume.Default=5
+Audio.Output.Mute=0
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 36
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525584; IdleTime=15
+
+action=get&category=Camera.General.*
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:43:43 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 944
+
+0
+OK
+Camera.General.ItemList=WhiteBalance;Sharpness;Shutter;Mirror;Flip;Denoise;
+Camera.General.WhiteBalance.Value=0
+Camera.General.WhiteBalance.Default=0
+Camera.General.WhiteBalance.Max=5
+Camera.General.WhiteBalance.Min=0
+Camera.General.Shutter.Value=0
+Camera.General.Shutter.Default=2
+Camera.General.Shutter.Max=5
+Camera.General.Shutter.Min=0
+Camera.General.Sharpness.Value=20
+Camera.General.Sharpness.Default=20
+Camera.General.Sharpness.Max=100
+Camera.General.Sharpness.Min=0
+Camera.General.Mirror.Value=0
+Camera.General.Mirror.Default=0
+Camera.General.Mirror.Max=1
+Camera.General.Mirror.Min=0
+Camera.General.Gamma.Value=4
+Camera.General.Gamma.Default=4
+Camera.General.Gamma.Max=4
+Camera.General.Gamma.Min=0
+Camera.General.Flip.Value=0
+Camera.General.Flip.Default=0
+Camera.General.Flip.Max=1
+Camera.General.Flip.Min=0
+Camera.General.Denoise.Value=1
+Camera.General.Denoise.Default=1
+Camera.General.Denoise.Max=10
+Camera.General.Denoise.Min=0
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 35
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525584; IdleTime=15
+
+action=get&category=Camera.Record.*
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:43:48 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 2135
+
+0
+OK
+Camera.Record.Overwrite=NO
+Camera.Record.PreRecord=YES
+Camera.Record.Enable=OFF
+Camera.Record.Device.List=AUTO;RAMDISK
+Camera.Record.Device.Name=AUTO
+Camera.Record.Video.ResolutionList=SXGA;HD720P;VGA;QVGA
+Camera.Record.Video.Resolution=HD720P
+Camera.Record.Audio.Enable=OFF
+Camera.Record.List=Alarm;PIR
+Camera.Record.Manual.Enable=OFF
+Camera.Record.Manual.Time=600
+Camera.Record.Timer.Enable=OFF
+Camera.Record.Timer.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.Enable=OFF
+Camera.Record.Motion.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.Enable=ON
+Camera.Record.Alarm.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.Enable=ON
+Camera.Record.PIR.Time=10
+Camera.Record.PIR.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 35
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525584; IdleTime=15
+
+action=get&category=Camera.Record.*
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:43:55 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 2135
+
+0
+OK
+Camera.Record.Overwrite=NO
+Camera.Record.PreRecord=YES
+Camera.Record.Enable=OFF
+Camera.Record.Device.List=AUTO;RAMDISK
+Camera.Record.Device.Name=AUTO
+Camera.Record.Video.ResolutionList=SXGA;HD720P;VGA;QVGA
+Camera.Record.Video.Resolution=HD720P
+Camera.Record.Audio.Enable=OFF
+Camera.Record.List=Alarm;PIR
+Camera.Record.Manual.Enable=OFF
+Camera.Record.Manual.Time=600
+Camera.Record.Timer.Enable=OFF
+Camera.Record.Timer.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.Enable=OFF
+Camera.Record.Motion.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.Enable=ON
+Camera.Record.Alarm.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.Enable=ON
+Camera.Record.PIR.Time=10
+Camera.Record.PIR.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 39
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525584; IdleTime=15
+
+action=get&category=Camera.Record.PIR.*
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:43:56 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 451
+
+0
+OK
+Camera.Record.PIR.Enable=ON
+Camera.Record.PIR.Time=10
+Camera.Record.PIR.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+
+
+===========================================================================================================================================
+POST /cgi-bin/power/Memory.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 28
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525584; IdleTime=15
+
+action=get&param=information
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:43:58 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/html
+Content-Length: 72
+
+0
+OK
+MEMORY_FILE_SYSTEM=RAMDISK
+MEMORY_CAPACITY=10240
+MEMORY_FREE=10236
+
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 34
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525584; IdleTime=15
+
+action=get&category=Notification.*
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:44:01 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 1620
+
+0
+OK
+Notification.Trigger.Alarm=ENABLE
+Notification.Trigger.Motion=ENABLE
+Notification.Trigger.PIR=ENABLE
+Notification.Trigger.Duration=5
+Notification.Method=NONE
+Notification.MethodList=NONE,MAIL,FTP,SMS
+Notification.MediaType=H264
+Notification.FileFormat=AVC
+Notification.RecordTime=3
+Notification.Guard=OFF
+Notification.GuardRule=12
+Notification.GuardRuleList=2,6,12
+Notification.SMSText=UHVzaCBWaWRlbyBBbGFybSE=
+Notification.GuardPush.MACAddress=00:0E:53:E8:7C:DA
+Notification.GuardTimer.Enable=OFF
+Notification.GuardTimer.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Notification.GuardTimer.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Notification.GuardTimer.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Notification.GuardTimer.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Notification.GuardTimer.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Notification.GuardTimer.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Notification.GuardTimer.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Notification.Action.EMailRule=NONE
+Notification.Action.EMailRuleList=ALARM;MOTION;PIR
+Notification.Action.FTPRule=NONE
+Notification.Action.FTPRuleList=ALARM;MOTION;PIR
+Notification.Action.SMSRule=NONE
+Notification.Action.SMSRuleList=ALARM;MOTION;PIR
+Notification.Action.AlarmOutRule=NONE
+Notification.Action.AlarmOutRuleList=ALARM;MOTION;PIR
+Notification.Action.LEDRule=ALARMOUTM
+Notification.Action.LEDRuleList=ALARM;MOTION;PIR;ALARMOUTM
+Notification.Action.RecordRule=ALARM|PIR
+Notification.Action.RecordRuleList=ALARM;PIR
+Notification.Action.SpeakerRule=ALARMOUTM
+Notification.Action.SpeakerRuleList=ALARMOUTM
+Notification.Policy.LED=ENABLE
+Notification.Policy.SlowShutter=ENABLE
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 21
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525584; IdleTime=15
+
+action=get&category=*
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:44:05 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 33623
+
+0
+OK
+General.TurboStep=0
+General.Language=ENGLISH
+General.Maxlog=300
+General.DeviceTitle=IPCAM
+General.DefaultLanguage=ENGLISH
+General.StatusLed.Usage=ENABLE
+LogLevels.CritLogEnabled=YES
+LogLevels.InfoLogEnabled=YES
+LogLevels.WarningLogEnabled=YES
+Notification.Trigger.Alarm=ENABLE
+Notification.Trigger.Motion=ENABLE
+Notification.Trigger.PIR=ENABLE
+Notification.Trigger.Duration=5
+Notification.Method=NONE
+Notification.MethodList=NONE,MAIL,FTP,SMS
+Notification.MediaType=H264
+Notification.FileFormat=AVC
+Notification.RecordTime=3
+Notification.Guard=OFF
+Notification.GuardRule=12
+Notification.GuardRuleList=2,6,12
+Notification.SMSText=UHVzaCBWaWRlbyBBbGFybSE=
+Notification.GuardPush.MACAddress=00:0E:53:E8:7C:DA
+Notification.GuardTimer.Enable=OFF
+Notification.GuardTimer.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Notification.GuardTimer.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Notification.GuardTimer.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Notification.GuardTimer.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Notification.GuardTimer.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Notification.GuardTimer.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Notification.GuardTimer.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Notification.Action.EMailRule=NONE
+Notification.Action.EMailRuleList=ALARM;MOTION;PIR
+Notification.Action.FTPRule=NONE
+Notification.Action.FTPRuleList=ALARM;MOTION;PIR
+Notification.Action.SMSRule=NONE
+Notification.Action.SMSRuleList=ALARM;MOTION;PIR
+Notification.Action.AlarmOutRule=NONE
+Notification.Action.AlarmOutRuleList=ALARM;MOTION;PIR
+Notification.Action.LEDRule=ALARMOUTM
+Notification.Action.LEDRuleList=ALARM;MOTION;PIR;ALARMOUTM
+Notification.Action.RecordRule=ALARM|PIR
+Notification.Action.RecordRuleList=ALARM;PIR
+Notification.Action.SpeakerRule=ALARMOUTM
+Notification.Action.SpeakerRuleList=ALARMOUTM
+Notification.Policy.LED=ENABLE
+Notification.Policy.SlowShutter=ENABLE
+MailLogd.LogSendLevel=0
+Device.Address=uuid:98190dc2-0890-4ef8-ac9a-5940995e6119
+Device.DiscoveryMode=ON
+Device.Scopes.Count=4
+Device.Scopes.Scope1.ScopeItem=onvif://www.onvif.org/type/video_encoder
+Device.Scopes.Scope1.ScopeDef=Fixed
+Device.Scopes.Scope2.ScopeItem=onvif://www.onvif.org/location/AVTECH
+Device.Scopes.Scope2.ScopeDef=Fixed
+Device.Scopes.Scope3.ScopeItem=onvif://www.onvif.org/hardware/AVTECH
+Device.Scopes.Scope3.ScopeDef=Fixed
+Device.Scopes.Scope4.ScopeItem=onvif://www.onvif.org/name/AVTECH
+Device.Scopes.Scope4.ScopeDef=Fixed
+Camera.System.ID=1
+Camera.System.Display=ALL
+Camera.System.DisplayZoomRatio=ON
+Camera.System.Title=IPCAM
+Camera.System.Position=D-R
+Camera.System.Timeout=0
+Camera.System.IsTiltUpLimit=YES
+Camera.System.TurboStep=5
+Camera.System.Baudrate=2400
+Camera.System.IsAuto=NO
+Camera.System.IsAutoTracking=NO
+Camera.System.LocalControl=ENABLE
+Camera.System.Speed.Pan=30
+Camera.System.Speed.Tilt=30
+Camera.System.Speed.Zoom=128
+Camera.System.Speed.Focus=128
+Camera.General.ItemList=WhiteBalance;Sharpness;Shutter;Mirror;Flip;Denoise;
+Camera.General.WhiteBalance.Value=0
+Camera.General.WhiteBalance.Default=0
+Camera.General.WhiteBalance.Max=5
+Camera.General.WhiteBalance.Min=0
+Camera.General.Shutter.Value=0
+Camera.General.Shutter.Default=2
+Camera.General.Shutter.Max=5
+Camera.General.Shutter.Min=0
+Camera.General.Sharpness.Value=20
+Camera.General.Sharpness.Default=20
+Camera.General.Sharpness.Max=100
+Camera.General.Sharpness.Min=0
+Camera.General.Mirror.Value=0
+Camera.General.Mirror.Default=0
+Camera.General.Mirror.Max=1
+Camera.General.Mirror.Min=0
+Camera.General.Gamma.Value=4
+Camera.General.Gamma.Default=4
+Camera.General.Gamma.Max=4
+Camera.General.Gamma.Min=0
+Camera.General.Flip.Value=0
+Camera.General.Flip.Default=0
+Camera.General.Flip.Max=1
+Camera.General.Flip.Min=0
+Camera.General.Denoise.Value=1
+Camera.General.Denoise.Default=1
+Camera.General.Denoise.Max=10
+Camera.General.Denoise.Min=0
+Camera.Preset.Count=1
+Camera.Preset.P1.No=1
+Camera.Preset.P1.Name=HOME
+Camera.Cruise.Mode=AutoPan
+Camera.Cruise.SmartSorting=DISABLE
+Camera.Cruise.ActiveSeq=1
+Camera.Cruise.AutoPan.LeftLimit.Pan=0
+Camera.Cruise.AutoPan.RightLimit.Pan=0
+Camera.Cruise.AutoPan.Speed.Pan=30
+Camera.Cruise.Seq1.Count=0
+Camera.Cruise.Seq2.Count=0
+Camera.Cruise.Seq3.Count=0
+Camera.Cruise.Seq4.Count=0
+Camera.Cruise.Seq4.AnchorNo=
+Camera.Tracking.LimitP1=1280
+Camera.Tracking.LimitP2=0
+Camera.Tracking.Time=10
+Camera.Detection.Sensitivity=1
+Camera.Detection.MaskArea=ff,ff,ff,ff,7,ff,7e,0,e0,0,0,7,0,7e,7,e0,7e,0,e0,0,0,7,0,7e,7,e0,7e,0,e0,0,0,7,ff,fe,ff,ff,ff,ff
+Camera.HDD.HddNearFullSize=5
+Camera.Record.Overwrite=NO
+Camera.Record.PreRecord=YES
+Camera.Record.Enable=OFF
+Camera.Record.Device.List=AUTO;RAMDISK
+Camera.Record.Device.Name=AUTO
+Camera.Record.Video.ResolutionList=SXGA;HD720P;VGA;QVGA
+Camera.Record.Video.Resolution=HD720P
+Camera.Record.Audio.Enable=OFF
+Camera.Record.List=Alarm;PIR
+Camera.Record.Manual.Enable=OFF
+Camera.Record.Manual.Time=600
+Camera.Record.Timer.Enable=OFF
+Camera.Record.Timer.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Timer.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.Enable=OFF
+Camera.Record.Motion.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Motion.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.Enable=ON
+Camera.Record.Alarm.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.Alarm.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.Enable=ON
+Camera.Record.PIR.Time=10
+Camera.Record.PIR.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Record.PIR.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Device.CH1.DeviceType=CAMERA
+Camera.Device.CH1.ID=0
+Camera.Device.CH1.Protocol=NORMAL
+Camera.Device.CH1.Rate=9600
+Camera.Led.Enable=ON
+Camera.Led.Level=100
+Camera.Led.List=Timer;Manual;Motion;Alarm
+Camera.Led.Manual.Enable=OFF
+Camera.Led.Manual.Level=0
+Camera.Led.Timer.Enable=OFF
+Camera.Led.Timer.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Timer.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Timer.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Timer.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Timer.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Timer.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Timer.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Motion.Enable=OFF
+Camera.Led.Motion.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Motion.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Motion.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Motion.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Motion.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Motion.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Motion.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Alarm.Enable=OFF
+Camera.Led.Alarm.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Alarm.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Alarm.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Alarm.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF0
+Camera.Led.Alarm.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Alarm.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Alarm.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.PIR.Enable=OFF
+Camera.Led.PIR.Time=10
+Camera.Led.PIR.L1.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.PIR.L2.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.PIR.L3.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.PIR.L4.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF0
+Camera.Led.PIR.L5.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.PIR.L6.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.PIR.L7.Time=0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+Camera.Led.Auto.Enable=OFF
+Account.Maxuser=10
+Account.AnonymousLogin=DISABLE
+Account.LocalPassword=0000
+Account.Group.PermitList=LiveView;Configuration;Playback;
+Account.Group.NameList=Administrator
+Account.User1.Username=admin
+Account.User1.Password=admin
+Account.User1.Level=SUPERVISOR
+Account.User1.Lifetime=INFINITE
+Network.BootProto=DHCP
+Network.IPAddress=192.168.0.158
+Network.Broadcast=192.168.1.255
+Network.DefaultRouter=192.168.0.254
+Network.SubnetMask=255.255.255.0
+Network.DNSServer1=168.95.1.1
+Network.DNSServer2=139.175.55.244
+Network.WebPort=88
+Network.DNSUpdate.Enabled=YES
+Network.DNSUpdate.Hostname=MAC000E53E87CDA
+Network.DNSUpdate.DNSName=default
+Network.SMTP.Port=25
+Network.SMTP.SSL=NO
+Network.SMTP.Authentication.Enabled=NO
+Network.FTP.Username=ftp
+Network.FTP.Password=1234
+Network.FTP.Port=21
+Network.FTP.Server=192.168.0.161
+Network.FTP.Directory=/home/ftp
+Network.SNTP.Period=0
+Network.SNTP.PeriodSecond=0
+Network.SNTP.GMT=57
+Network.SNTP.GMTOffset=480
+Network.SNTP.ServerName=tock.stdtime.gov.tw
+Network.SNTP.TimeZoneName=PST8PDT,M3.2.0/2,M11.1.0/2
+Network.eth0.MACAddress=00:0E:53:E8:7C:DA
+Network.Filter.ErrorCount=3
+Network.Filter.ErrorLocktime=0
+Network.Filter.ICMP8=ENABLE
+Network.Filter.Enabled=NO
+Network.Filter.Input.Policy=DENY
+Network.RTP.StartPort=50000
+Network.RTP.EndPort=60000
+Network.RTP.Multicast.Video.H264.ResolutionList=SXGA;HD720P;VGA;QVGA;QQVGA
+Network.RTP.Multicast.Video.H264.Address=239.101.101.101
+Network.RTP.Multicast.Video.H264.Port=9000
+Network.RTP.Multicast.Video.H264.HD720P.Address=239.101.101.102
+Network.RTP.Multicast.Video.H264.HD720P.Port=9000
+Network.RTP.Multicast.Video.H264.VGA.Address=239.101.101.103
+Network.RTP.Multicast.Video.H264.VGA.Port=9000
+Network.RTP.Multicast.Video.H264.QVGA.Address=239.101.101.104
+Network.RTP.Multicast.Video.H264.QVGA.Port=9000
+Network.RTP.Multicast.Video.H264.QQVGA.Address=239.101.101.105
+Network.RTP.Multicast.Video.H264.QQVGA.Port=9000
+Network.RTP.Multicast.Video.Mpeg4.ResolutionList=SXGA;HD720P;VGA;QVGA;QQVGA
+Network.RTP.Multicast.Video.Mpeg4.Address=239.101.102.101
+Network.RTP.Multicast.Video.Mpeg4.Port=9000
+Network.RTP.Multicast.Video.Mpeg4.HD720P.Address=239.101.102.102
+Network.RTP.Multicast.Video.Mpeg4.HD720P.Port=9000
+Network.RTP.Multicast.Video.Mpeg4.VGA.Address=239.101.102.103
+Network.RTP.Multicast.Video.Mpeg4.VGA.Port=9000
+Network.RTP.Multicast.Video.Mpeg4.QVGA.Address=239.101.102.104
+Network.RTP.Multicast.Video.Mpeg4.QVGA.Port=9000
+Network.RTP.Multicast.Video.Mpeg4.QQVGA.Address=239.101.102.105
+Network.RTP.Multicast.Video.Mpeg4.QQVGA.Port=9000
+Network.RTP.Multicast.Video.Jpeg.ResolutionList=SXGA;HD720P;VGA;QVGA;QQVGA
+Network.RTP.Multicast.Video.Jpeg.Address=239.101.103.101
+Network.RTP.Multicast.Video.Jpeg.Port=9000
+Network.RTP.Multicast.Video.Jpeg.HD720P.Address=239.101.103.102
+Network.RTP.Multicast.Video.Jpeg.HD720P.Port=9000
+Network.RTP.Multicast.Video.Jpeg.VGA.Address=239.101.103.103
+Network.RTP.Multicast.Video.Jpeg.VGA.Port=9000
+Network.RTP.Multicast.Video.Jpeg.QVGA.Address=239.101.103.104
+Network.RTP.Multicast.Video.Jpeg.QVGA.Port=9000
+Network.RTP.Multicast.Video.Jpeg.QQVGA.Address=239.101.103.105
+Network.RTP.Multicast.Video.Jpeg.QQVGA.Port=9000
+Network.RTP.Multicast.Audio.Address=239.101.104.101
+Network.RTP.Multicast.Audio.Port=9000
+Network.RTP.Multicast.TTL=15
+Network.RTSP.Enabled=YES
+Network.UPNP.Enabled=YES
+Network.UPNP.FriendlyName=IP CAMERA (Fixed) AVM301-000E53E87CDA
+Network.UPNP.Manufacturer=AVTECH Corporation.
+Network.UPNP.ManufacturerURL=http://www.avtech.com.tw/
+Network.UPNP.NATTraversal.Enabled=YES
+Network.UPNP.NATTraversal.HTTPPort=88
+Network.UPNP.NATTraversal.HTTPSPort=0
+Network.UPNP.NATTraversal.MinPort=32768
+Network.UPNP.NATTraversal.MaxPort=65535
+Network.ZeroConf.Enabled=NO
+Network.ZeroConf.SubnetMask=255.255.0.0
+Network.Bonjour.Enabled=YES
+Network.Bonjour.DeviceName=IP CAMERA (Fixed) AVM301-000E53E87CDA
+Network.HTML.Index=nobody/login.htm
+Network.HTML.Timeout=15
+Network.HTML.Config=YES
+Network.HTTPS.Port=443
+Network.HTTPS.CommonName=IP Address
+Network.HTTPS.OrganizationalUnitName=Unit Name
+Network.HTTPS.OrganizationName=Organization Name
+Network.HTTPS.LocalityName=City Name
+Network.HTTPS.ProvinceName=Province
+Network.HTTPS.CountryName=TW
+Network.HTTPS.PrivateKey=LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tDQpNSUlDZGdJQkFEQU5CZ2txaGtpRzl3MEJBUUVGQUFTQ0FtQXdnZ0pjQWdFQUFvR0JBTUJIeVBOa2tmL2g1aFMxDQpOenFkOE5oNy9MQVlVNndRM0d3MDBzZDFlN0dzdkE0U0h5eFAzNTR3TEVDSG9rWGFjS0xkZEtUdjZoakVOWisrDQpkYSs4NmhZNldQK2RNbEd1dHhsS0c2ZE5hckU3aDlMMU9CQk5GT1RuN3cwbHk1NWJ6aDFnK1B3cUtPRitVamFyDQo2QnVCS25udDFyemZkR3J6amNySTE4UkIzTXhOQWdNQkFBRUNnWUFyTjNjNURWK3JUWkN6RXMvcEF0ckJMWXpyDQozMnZlL3FNc1J1c2hIWXpCc0h0TUJsS3ZXUHgveDRBS3VQR0dGY1MvTmxzalB6RTBnOVV4cEZNN1BwQzJMaXZ6DQo3NEwzZ3ZsbnY0ZUZZYlFxY2ZvMG16aVF0VUVSb0tROXR6a0NqQ0J6RnpwTWx1dWMxQkU2VlFPQTJmbk1iRUwwDQpxTm9meHluWnU2eTNHM0RIbVFKQkFQRnk2UWZxVEJMTFZFSS9raEt3cGRhRTFwUHJJZWtWa3F0Q2JScnAwRDNqDQpoTkV2UTJsTXdoVjAyZnd2U2R0YUZKMFdxZDJobHJxSjlpSXZWNkhGeTA4Q1FRREwza3ppMEI3UGM5K1NBVENRDQpQZUgrZnY3dGJhem9aZk1BblBGUmYrMkU3THJXODBNSng5elJKQVVvdUlzUHJidnZEYlczb2wwdmYxazY1YkRhDQp3OWVqQWtFQW9Yb09hMkxBMmRqdVV4Z2M0eThNMmpraElQQWlUN1pEenhHdjBrNEpIVHJxZXRRM0sxZFFmZlVXDQpURmg3OXAxNko4MGVjY0UrQXlkOVcwTjZRaEQ4ZFFKQURsOGhkR3ZQZ0RoZTdsLy9HR3dFWG5oOWFDZHZKUUxxDQoyb1ExenRVQjNYa0N3dHhyUVdsQmU4emFRRUNpTFB6R1h0Zk1rNkZ5aUVLbCs2enRocjUvbVFKQVM3b0hPSXlkDQpFYUNkUEZKNllVNzVmYzQyMll2QkVIVjcwUmQzTnphN3VPclZXcGQ1NWdlTVpOUi9vRDJmNEM2aUxqS2UzdmdMDQpQUE5uZko5dGJuK2dSQT09DQotLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tDQo=
+Network.HTTPS.Certificate=LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tDQpNSUlDd0RDQ0FpbWdBd0lCQWdJSkFNckpwTVUyQnJlWE1BMEdDU3FHU0liM0RRRUJCUVVBTUhreEN6QUpCZ05WDQpCQVlUQWxSWE1SRXdEd1lEVlFRSURBaFFjbTkyYVc1alpURVNNQkFHQTFVRUJ3d0pRMmwwZVNCT1lXMWxNUm93DQpHQVlEVlFRS0RCRlBjbWRoYm1sNllYUnBiMjRnVG1GdFpURVNNQkFHQTFVRUN3d0pWVzVwZENCT1lXMWxNUk13DQpFUVlEVlFRRERBcEpVQ0JCWkdSeVpYTnpNQjRYRFRFd01EZ3hPREUzTVRnME1Gb1hEVEl3TURneE5URTNNVGcwDQpNRm93ZVRFTE1Ba0dBMVVFQmhNQ1ZGY3hFVEFQQmdOVkJBZ01DRkJ5YjNacGJtTmxNUkl3RUFZRFZRUUhEQWxEDQphWFI1SUU1aGJXVXhHakFZQmdOVkJBb01FVTl5WjJGdWFYcGhkR2x2YmlCT1lXMWxNUkl3RUFZRFZRUUxEQWxWDQpibWwwSUU1aGJXVXhFekFSQmdOVkJBTU1Da2xRSUVGa1pISmxjM013Z1o4d0RRWUpLb1pJaHZjTkFRRUJCUUFEDQpnWTBBTUlHSkFvR0JBTUJIeVBOa2tmL2g1aFMxTnpxZDhOaDcvTEFZVTZ3UTNHdzAwc2QxZTdHc3ZBNFNIeXhQDQozNTR3TEVDSG9rWGFjS0xkZEtUdjZoakVOWisrZGErODZoWTZXUCtkTWxHdXR4bEtHNmROYXJFN2g5TDFPQkJODQpGT1RuN3cwbHk1NWJ6aDFnK1B3cUtPRitVamFyNkJ1QktubnQxcnpmZEdyempjckkxOFJCM014TkFnTUJBQUdqDQpVREJPTUIwR0ExVWREZ1FXQkJTcUxhaHdyQ01IQVhrT2RUSGRnVVJxNDZXa2tqQWZCZ05WSFNNRUdEQVdnQlNxDQpMYWh3ckNNSEFYa09kVEhkZ1VScTQ2V2trakFNQmdOVkhSTUVCVEFEQVFIL01BMEdDU3FHU0liM0RRRUJCUVVBDQpBNEdCQUp2aXhFdTZzQ20wZTBPMFhVMXZ6QWVsNTdSR2dOajFON3MxSTUyMndUUkdleXpaWnpOdmxJSE1tak5MDQpYeGlsSXBqM1gzT04vK0doM0pwYU1LNC9SQUovL2dBSzhaaWIxRVJYbDBsM0x2T25ycGcyNWw2b00wYmdEYTg0DQo3dG5YalZqcGppMXkvNG43S0YybDhXV0dOa1pjSWMzRGdmTW55LzVGeGRkeHNkL3UNCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0NCg==
+Network.NAT.Enabled=NO
+Network.NAT.SyncDDNS=YES
+Network.NAT.Hostname=MAC000E53E87CDA
+Network.NAT.FirstUse=NO
+Network.WIFI.Enabled=YES
+Network.WIFI.BootProto=DHCP
+Network.WIFI.IPAddress=192.168.2.10
+Network.WIFI.SubnetMask=255.255.255.0
+Network.WIFI.DefaultRouter=192.168.2.254
+Network.WIFI.Profile.Default=1
+Network.WIFI.Profile.Max=10
+Network.WIFI.Profile.Used=2
+Network.WIFI.AP1.ProfileName=Default_ProfileName
+Network.WIFI.AP1.NetworkType=Adhoc
+Network.WIFI.AP1.AuthMode=OPEN
+Network.WIFI.AP1.EncrypType=NONE
+Network.WIFI.AP1.SSID=IP-CAMERA
+Network.WIFI.AP1.CHANNEL=1
+Network.WIFI.AP1.AdhocOfdm=1
+Network.WIFI.AP2.ProfileName=WPS_ProfileName
+Network.QOS.Enabled=NO
+Network.QOS.Device=eth0
+Network.QOS.Interface=eth0
+Network.QOS.MaxUploadRate=4096
+Network.SMS.System=clickatell
+Network.SMS.SystemList=clickatell;EVERY8D
+Network.SMS.Encryption=base64
+Network.SMS.Interval=15
+Network.SMS.AddDomainName=NO
+Network.SMS.SendType=SMS
+Network.MODEM.Enabled=NO
+Properties.Firmware.Version.FBoot=1008
+Properties.Firmware.Version.SBoot=1000
+Properties.Firmware.Version.Kernel=1024
+Properties.Firmware.Version.Application=1035
+Properties.Firmware.Version.Xml=1025
+Properties.Firmware.BuildDate=2007.01.04.
+Properties.Firmware.BuildNumber=1
+Properties.Image.Resolution=SXGA;HD720P;VGA;QVGA;QQVGA
+Properties.Image.Format=H264,MPEG4,MJPEG
+Properties.Image.Default=H264
+Properties.Audio.NbrOfSources=1
+Properties.Video.NbrOfSources=1
+Properties.Option=Resolution_Independent
+Video.Number=1
+Video.I0.Brightness=50
+Video.I0.BrightnessDefault=50
+Video.I0.BrightnessMax=100
+Video.I0.BrightnessMin=0
+Video.I0.Contrast=55
+Video.I0.ContrastDefault=55
+Video.I0.ContrastMax=100
+Video.I0.ContrastMin=0
+Video.I0.Saturation=65
+Video.I0.SaturationDefault=65
+Video.I0.SaturationMax=100
+Video.I0.SaturationMin=0
+Video.I0.Hue=50
+Video.I0.HueDefault=50
+Video.I0.HueMax=100
+Video.I0.HueMin=0
+Video.I0.System=NTSC
+Video.I0.PowerLineFrequency=60
+Video.I0.Framerate=0
+Video.I0.FramerateMax=30
+Video.I0.Jpeg.ResolutionList=SXGA;HD720P;VGA;QVGA;QQVGA
+Video.I0.Jpeg.Resolution=SXGA
+Video.I0.Jpeg.Quality=HIGH
+Video.I0.Jpeg.SXGA.Quality=BEST
+Video.I0.Jpeg.SXGA.Framerate=8
+Video.I0.Jpeg.HD720P.Quality=BEST
+Video.I0.Jpeg.HD720P.Framerate=8
+Video.I0.Jpeg.VGA.Quality=HIGH
+Video.I0.Jpeg.VGA.Framerate=30
+Video.I0.Jpeg.QVGA.Quality=HIGH
+Video.I0.Jpeg.QVGA.Framerate=30
+Video.I0.Jpeg.QQVGA.Quality=HIGH
+Video.I0.Jpeg.QQVGA.Framerate=30
+Video.I0.Mpeg4.ResolutionList=SXGA;HD720P;VGA;QVGA;QQVGA
+Video.I0.Mpeg4.Resolution=SXGA
+Video.I0.Mpeg4.Quality=HIGH
+Video.I0.Mpeg4.RateCtrlMode=EVBR
+Video.I0.Mpeg4.MaxBitrate=5000
+Video.I0.Mpeg4.SXGA.Quality=HIGH
+Video.I0.Mpeg4.SXGA.RateCtrlMode=EVBR
+Video.I0.Mpeg4.SXGA.MaxBitrate=5000
+Video.I0.Mpeg4.SXGA.Framerate=20
+Video.I0.Mpeg4.HD720P.Quality=HIGH
+Video.I0.Mpeg4.HD720P.RateCtrlMode=EVBR
+Video.I0.Mpeg4.HD720P.MaxBitrate=5000
+Video.I0.Mpeg4.HD720P.Framerate=20
+Video.I0.Mpeg4.VGA.Quality=HIGH
+Video.I0.Mpeg4.VGA.RateCtrlMode=EVBR
+Video.I0.Mpeg4.VGA.MaxBitrate=3000
+Video.I0.Mpeg4.VGA.Framerate=30
+Video.I0.Mpeg4.QVGA.Quality=HIGH
+Video.I0.Mpeg4.QVGA.RateCtrlMode=EVBR
+Video.I0.Mpeg4.QVGA.MaxBitrate=3000
+Video.I0.Mpeg4.QVGA.Framerate=30
+Video.I0.Mpeg4.QQVGA.Quality=HIGH
+Video.I0.Mpeg4.QQVGA.RateCtrlMode=EVBR
+Video.I0.Mpeg4.QQVGA.MaxBitrate=3000
+Video.I0.Mpeg4.QQVGA.Framerate=30
+Video.I0.H264.ResolutionList=SXGA;HD720P;VGA;QVGA;QQVGA
+Video.I0.H264.Resolution=SXGA
+Video.I0.H264.Quality=BEST
+Video.I0.H264.RateCtrlMode=EVBR
+Video.I0.H264.MaxBitrate=5000
+Video.I0.H264.SXGA.Quality=BEST
+Video.I0.H264.SXGA.RateCtrlMode=EVBR
+Video.I0.H264.SXGA.MaxBitrate=5000
+Video.I0.H264.SXGA.Framerate=30
+Video.I0.H264.HD720P.Quality=BEST
+Video.I0.H264.HD720P.RateCtrlMode=EVBR
+Video.I0.H264.HD720P.MaxBitrate=5000
+Video.I0.H264.HD720P.Framerate=30
+Video.I0.H264.VGA.Quality=HIGH
+Video.I0.H264.VGA.RateCtrlMode=EVBR
+Video.I0.H264.VGA.MaxBitrate=3000
+Video.I0.H264.VGA.Framerate=30
+Video.I0.H264.QVGA.Quality=HIGH
+Video.I0.H264.QVGA.RateCtrlMode=EVBR
+Video.I0.H264.QVGA.MaxBitrate=3000
+Video.I0.H264.QVGA.Framerate=30
+Video.I0.H264.QQVGA.Quality=HIGH
+Video.I0.H264.QQVGA.RateCtrlMode=EVBR
+Video.I0.H264.QQVGA.MaxBitrate=3000
+Video.I0.H264.QQVGA.Framerate=30
+Media.Profiles.Count=3
+Media.Profiles.Profile1.token=PROFILE-1
+Media.Profiles.Profile1.Name=PROFILE-1
+Media.Profiles.Profile1.VideoSourceConfiguration.token=VS1token
+Media.Profiles.Profile1.VideoSourceConfiguration.Name=VS1
+Media.Profiles.Profile1.VideoSourceConfiguration.UseCount=1
+Media.Profiles.Profile1.VideoSourceConfiguration.SourceToken=VS1srctoken
+Media.Profiles.Profile1.VideoSourceConfiguration.Bounds.x=0
+Media.Profiles.Profile1.VideoSourceConfiguration.Bounds.y=0
+Media.Profiles.Profile1.VideoSourceConfiguration.Bounds.width=352
+Media.Profiles.Profile1.VideoSourceConfiguration.Bounds.height=240
+Media.Profiles.Profile1.VideoEncoderConfiguration.token=VE1token
+Media.Profiles.Profile1.VideoEncoderConfiguration.Name=VE1
+Media.Profiles.Profile1.VideoEncoderConfiguration.UseCount=2
+Media.Profiles.Profile1.VideoEncoderConfiguration.Encoding=JPEG
+Media.Profiles.Profile1.VideoEncoderConfiguration.Resolution.Width=1280
+Media.Profiles.Profile1.VideoEncoderConfiguration.Resolution.Height=1024
+Media.Profiles.Profile1.VideoEncoderConfiguration.Quality=1.000000
+Media.Profiles.Profile1.VideoEncoderConfiguration.RateControl.FrameRateLimit=8
+Media.Profiles.Profile1.VideoEncoderConfiguration.RateControl.EncodingInterval=1
+Media.Profiles.Profile1.VideoEncoderConfiguration.RateControl.BitrateLimit=1400
+Media.Profiles.Profile1.VideoEncoderConfiguration.MPEG4.GovLength=30
+Media.Profiles.Profile1.VideoEncoderConfiguration.MPEG4.Mpeg4Profile=SP
+Media.Profiles.Profile1.VideoEncoderConfiguration.H264.GovLength=30
+Media.Profiles.Profile1.VideoEncoderConfiguration.H264.H264Profile=Baseline
+Media.Profiles.Profile1.VideoEncoderConfiguration.Multicast.Address.Type=IPv4
+Media.Profiles.Profile1.VideoEncoderConfiguration.Multicast.Port=0
+Media.Profiles.Profile1.VideoEncoderConfiguration.Multicast.TTL=0
+Media.Profiles.Profile1.VideoEncoderConfiguration.Multicast.AutoStart=false
+Media.Profiles.Profile1.VideoEncoderConfiguration.SessionTimeout=P1Y
+Media.Profiles.Profile1.AudioSourceConfiguration.token=AS1token
+Media.Profiles.Profile1.AudioSourceConfiguration.Name=AS1
+Media.Profiles.Profile1.AudioSourceConfiguration.UseCount=1
+Media.Profiles.Profile1.AudioSourceConfiguration.SourceToken=AS1srctoken
+Media.Profiles.Profile1.AudioEncoderConfiguration.token=AE1token
+Media.Profiles.Profile1.AudioEncoderConfiguration.Name=AE1
+Media.Profiles.Profile1.AudioEncoderConfiguration.UseCount=1
+Media.Profiles.Profile1.AudioEncoderConfiguration.Encoding=G711
+Media.Profiles.Profile1.AudioEncoderConfiguration.Bitrate=8192
+Media.Profiles.Profile1.AudioEncoderConfiguration.SampleRate=8000
+Media.Profiles.Profile1.AudioEncoderConfiguration.Multicast.Address.Type=IPv4
+Media.Profiles.Profile1.AudioEncoderConfiguration.Multicast.Port=0
+Media.Profiles.Profile1.AudioEncoderConfiguration.Multicast.TTL=0
+Media.Profiles.Profile1.AudioEncoderConfiguration.Multicast.AutoStart=false
+Media.Profiles.Profile1.AudioEncoderConfiguration.SessionTimeout=P1Y
+Media.Profiles.Profile1.PTZConfiguration.token=ptz001_token
+Media.Profiles.Profile1.PTZConfiguration.Name=ptz001
+Media.Profiles.Profile1.PTZConfiguration.NodeToken=node001_token
+Media.Profiles.Profile1.PTZConfiguration.DefaultAbsolutePantTiltPositionSpace=http://www.onvif.org/ver10/tptz/PanTiltSpaces/DigitalPositionSpace
+Media.Profiles.Profile1.PTZConfiguration.DefaultAbsoluteZoomPositionSpace=http://www.onvif.org/ver10/tptz/ZoomSpaces/NormalizedDigitalPositionSpace
+Media.Profiles.Profile1.PTZConfiguration.DefaultPTZSpeed.PanTilt.x=0.0
+Media.Profiles.Profile1.PTZConfiguration.DefaultPTZSpeed.PanTilt.y=1.0
+Media.Profiles.Profile1.PTZConfiguration.PanTiltLimits.Range.XRange.Max=1
+Media.Profiles.Profile1.PTZConfiguration.PanTiltLimits.Range.XRange.Min=-1
+Media.Profiles.Profile1.PTZConfiguration.PanTiltLimits.Range.YRange.Max=1
+Media.Profiles.Profile1.PTZConfiguration.PanTiltLimits.Range.YRange.Min=-1
+Media.Profiles.Profile1.PTZConfiguration.ZoomLimits.Range.XRange.Max=1
+Media.Profiles.Profile1.PTZConfiguration.ZoomLimits.Range.XRange.Min=0
+Media.Profiles.Profile2.token=PROFILE-2
+Media.Profiles.Profile2.Name=PROFILE-2
+Media.Profiles.Profile2.VideoSourceConfiguration.token=VS1token
+Media.Profiles.Profile2.VideoSourceConfiguration.Name=VS1
+Media.Profiles.Profile2.VideoSourceConfiguration.UseCount=1
+Media.Profiles.Profile2.VideoSourceConfiguration.SourceToken=VS1srctoken
+Media.Profiles.Profile2.VideoSourceConfiguration.Bounds.x=0
+Media.Profiles.Profile2.VideoSourceConfiguration.Bounds.y=0
+Media.Profiles.Profile2.VideoSourceConfiguration.Bounds.width=352
+Media.Profiles.Profile2.VideoSourceConfiguration.Bounds.height=240
+Media.Profiles.Profile2.VideoEncoderConfiguration.token=VE2token
+Media.Profiles.Profile2.VideoEncoderConfiguration.Name=VE2
+Media.Profiles.Profile2.VideoEncoderConfiguration.UseCount=1
+Media.Profiles.Profile2.VideoEncoderConfiguration.Encoding=MPEG4
+Media.Profiles.Profile2.VideoEncoderConfiguration.Resolution.Width=352
+Media.Profiles.Profile2.VideoEncoderConfiguration.Resolution.Height=240
+Media.Profiles.Profile2.VideoEncoderConfiguration.Quality=5
+Media.Profiles.Profile2.VideoEncoderConfiguration.RateControl.FrameRateLimit=30
+Media.Profiles.Profile2.VideoEncoderConfiguration.RateControl.EncodingInterval=1
+Media.Profiles.Profile2.VideoEncoderConfiguration.RateControl.BitrateLimit=1400
+Media.Profiles.Profile2.VideoEncoderConfiguration.MPEG4.GovLength=30
+Media.Profiles.Profile2.VideoEncoderConfiguration.MPEG4.Mpeg4Profile=SP
+Media.Profiles.Profile2.VideoEncoderConfiguration.H264.GovLength=30
+Media.Profiles.Profile2.VideoEncoderConfiguration.H264.H264Profile=Baseline
+Media.Profiles.Profile2.VideoEncoderConfiguration.Multicast.Address.Type=IPv4
+Media.Profiles.Profile2.VideoEncoderConfiguration.Multicast.Port=0
+Media.Profiles.Profile2.VideoEncoderConfiguration.Multicast.TTL=0
+Media.Profiles.Profile2.VideoEncoderConfiguration.Multicast.AutoStart=false
+Media.Profiles.Profile2.VideoEncoderConfiguration.SessionTimeout=P1Y
+Media.Profiles.Profile2.AudioSourceConfiguration.token=AS1token
+Media.Profiles.Profile2.AudioSourceConfiguration.Name=AS1
+Media.Profiles.Profile2.AudioSourceConfiguration.UseCount=1
+Media.Profiles.Profile2.AudioSourceConfiguration.SourceToken=AS1srctoken
+Media.Profiles.Profile2.AudioEncoderConfiguration.token=AE2token
+Media.Profiles.Profile2.AudioEncoderConfiguration.Name=AE2
+Media.Profiles.Profile2.AudioEncoderConfiguration.UseCount=1
+Media.Profiles.Profile2.AudioEncoderConfiguration.Encoding=G711
+Media.Profiles.Profile2.AudioEncoderConfiguration.Bitrate=8192
+Media.Profiles.Profile2.AudioEncoderConfiguration.SampleRate=8000
+Media.Profiles.Profile2.AudioEncoderConfiguration.Multicast.Address.Type=IPv4
+Media.Profiles.Profile2.AudioEncoderConfiguration.Multicast.Port=0
+Media.Profiles.Profile2.AudioEncoderConfiguration.Multicast.TTL=0
+Media.Profiles.Profile2.AudioEncoderConfiguration.Multicast.AutoStart=false
+Media.Profiles.Profile2.AudioEncoderConfiguration.SessionTimeout=P1Y
+Media.Profiles.Profile3.token=PROFILE-3
+Media.Profiles.Profile3.Name=PROFILE-3
+Media.Profiles.Profile3.VideoSourceConfiguration.token=VS1token
+Media.Profiles.Profile3.VideoSourceConfiguration.Name=VS1
+Media.Profiles.Profile3.VideoSourceConfiguration.UseCount=1
+Media.Profiles.Profile3.VideoSourceConfiguration.SourceToken=VS1srctoken
+Media.Profiles.Profile3.VideoSourceConfiguration.Bounds.x=0
+Media.Profiles.Profile3.VideoSourceConfiguration.Bounds.y=0
+Media.Profiles.Profile3.VideoSourceConfiguration.Bounds.width=352
+Media.Profiles.Profile3.VideoSourceConfiguration.Bounds.height=240
+Media.Profiles.Profile3.VideoEncoderConfiguration.token=VE3token
+Media.Profiles.Profile3.VideoEncoderConfiguration.Name=VE3
+Media.Profiles.Profile3.VideoEncoderConfiguration.UseCount=1
+Media.Profiles.Profile3.VideoEncoderConfiguration.Encoding=H264
+Media.Profiles.Profile3.VideoEncoderConfiguration.Resolution.Width=352
+Media.Profiles.Profile3.VideoEncoderConfiguration.Resolution.Height=240
+Media.Profiles.Profile3.VideoEncoderConfiguration.Quality=5
+Media.Profiles.Profile3.VideoEncoderConfiguration.RateControl.FrameRateLimit=30
+Media.Profiles.Profile3.VideoEncoderConfiguration.RateControl.EncodingInterval=1
+Media.Profiles.Profile3.VideoEncoderConfiguration.RateControl.BitrateLimit=1400
+Media.Profiles.Profile3.VideoEncoderConfiguration.MPEG4.GovLength=30
+Media.Profiles.Profile3.VideoEncoderConfiguration.MPEG4.Mpeg4Profile=SP
+Media.Profiles.Profile3.VideoEncoderConfiguration.H264.GovLength=30
+Media.Profiles.Profile3.VideoEncoderConfiguration.H264.H264Profile=Baseline
+Media.Profiles.Profile3.VideoEncoderConfiguration.Multicast.Address.Type=IPv4
+Media.Profiles.Profile3.VideoEncoderConfiguration.Multicast.Port=0
+Media.Profiles.Profile3.VideoEncoderConfiguration.Multicast.TTL=0
+Media.Profiles.Profile3.VideoEncoderConfiguration.Multicast.AutoStart=false
+Media.Profiles.Profile3.VideoEncoderConfiguration.SessionTimeout=P1Y
+Media.Profiles.Profile3.AudioSourceConfiguration.token=AS1token
+Media.Profiles.Profile3.AudioSourceConfiguration.Name=AS1
+Media.Profiles.Profile3.AudioSourceConfiguration.UseCount=1
+Media.Profiles.Profile3.AudioSourceConfiguration.SourceToken=AS1srctoken
+Media.Profiles.Profile3.AudioEncoderConfiguration.token=AE3token
+Media.Profiles.Profile3.AudioEncoderConfiguration.Name=AE3
+Media.Profiles.Profile3.AudioEncoderConfiguration.UseCount=1
+Media.Profiles.Profile3.AudioEncoderConfiguration.Encoding=G711
+Media.Profiles.Profile3.AudioEncoderConfiguration.Bitrate=8192
+Media.Profiles.Profile3.AudioEncoderConfiguration.SampleRate=8000
+Media.Profiles.Profile3.AudioEncoderConfiguration.Multicast.Address.Type=IPv4
+Media.Profiles.Profile3.AudioEncoderConfiguration.Multicast.Port=0
+Media.Profiles.Profile3.AudioEncoderConfiguration.Multicast.TTL=0
+Media.Profiles.Profile3.AudioEncoderConfiguration.Multicast.AutoStart=false
+Media.Profiles.Profile3.AudioEncoderConfiguration.SessionTimeout=P1Y
+Brand.Brand=AVTECH
+Brand.ProdFullName=Surveillance
+Brand.ProdMajorNbr=718
+Brand.ProdMinorNbr=AVM301
+Brand.ProdType=IPCAM
+Brand.WebURL=http://www.avtech.com.tw
+Audio.Input.Volume.Max=10
+Audio.Input.Volume.Min=1
+Audio.Input.Volume.Value=5
+Audio.Input.Volume.Default=5
+Audio.Input.Mute=0
+Audio.Output.Volume.Max=10
+Audio.Output.Volume.Min=1
+Audio.Output.Volume.Value=5
+Audio.Output.Volume.Default=5
+Audio.Output.Mute=0
+Misc.Time.OSD.Enable=OFF
+Misc.DaylightSaving.Enable=OFF
+Misc.DaylightSaving.DaylightStart=07-01-0 6:00
+Misc.DaylightSaving.DaylightEnd=09-01-4 10:00
+Misc.DaylightSaving.AdjustTime=1:00
+Misc.Wizard.Auto=YES
+Misc.External.DI.Port1.Channel=1;
+Misc.External.DI.Port1.Active=N.O.
+Misc.External.DO.Port1.Channel=1;
+Misc.External.DO.Port1.Trigger=NONE
+Misc.External.DO.Port1.Active=LOW
+Misc.External.DO.Manual.Duration=20
+Misc.IOControl.Number=7
+Misc.IOControl.IO1.Title=IO-1
+Misc.IOControl.IO1.Switch=OFF
+Misc.IOControl.IO1.Baudrate=9600
+Misc.IOControl.IO2.Title=IO-2
+Misc.IOControl.IO2.Switch=OFF
+Misc.IOControl.IO2.Baudrate=9600
+Misc.IOControl.IO3.Title=IO-3
+Misc.IOControl.IO3.Switch=OFF
+Misc.IOControl.IO3.Baudrate=9600
+Misc.IOControl.IO4.Title=IO-4
+Misc.IOControl.IO4.Switch=OFF
+Misc.IOControl.IO4.Baudrate=9600
+Misc.IOControl.IO5.Title=IO-5
+Misc.IOControl.IO5.Switch=OFF
+Misc.IOControl.IO5.Baudrate=9600
+Misc.IOControl.IO6.Title=IO-6
+Misc.IOControl.IO6.Switch=OFF
+Misc.IOControl.IO6.Baudrate=9600
+Misc.IOControl.IO7.Title=IO-7
+Misc.IOControl.IO7.Switch=OFF
+Misc.IOControl.IO7.Baudrate=9600
+Misc.IOBox.Input1.Enable=OFF
+Misc.IOBox.Input1.AutoTracking=OFF
+Misc.IOBox.Input1.DwellTime=5
+Misc.IOBox.Input1.PresetNo=1
+Misc.IOBox.Input1.Active=N.C.
+Misc.IOBox.Input2.Enable=OFF
+Misc.IOBox.Input2.AutoTracking=OFF
+Misc.IOBox.Input2.DwellTime=5
+Misc.IOBox.Input2.PresetNo=2
+Misc.IOBox.Input2.Active=N.C.
+Misc.IOBox.Input3.Enable=OFF
+Misc.IOBox.Input3.AutoTracking=OFF
+Misc.IOBox.Input3.DwellTime=5
+Misc.IOBox.Input3.PresetNo=3
+Misc.IOBox.Input3.Active=N.C.
+Misc.IOBox.Input4.Enable=OFF
+Misc.IOBox.Input4.AutoTracking=OFF
+Misc.IOBox.Input4.DwellTime=5
+Misc.IOBox.Input4.PresetNo=4
+Misc.IOBox.Input4.Active=N.C.
+Misc.IOBox.Input5.Enable=OFF
+Misc.IOBox.Input5.AutoTracking=OFF
+Misc.IOBox.Input5.DwellTime=5
+Misc.IOBox.Input5.PresetNo=5
+Misc.IOBox.Input5.Active=N.C.
+Misc.IOBox.Input6.Enable=OFF
+Misc.IOBox.Input6.AutoTracking=OFF
+Misc.IOBox.Input6.DwellTime=5
+Misc.IOBox.Input6.PresetNo=6
+Misc.IOBox.Input6.Active=N.C.
+Misc.IOBox.Input7.Enable=OFF
+Misc.IOBox.Input7.AutoTracking=OFF
+Misc.IOBox.Input7.DwellTime=5
+Misc.IOBox.Input7.PresetNo=7
+Misc.IOBox.Input7.Active=N.C.
+Misc.IOBox.Input8.Enable=OFF
+Misc.IOBox.Input8.AutoTracking=OFF
+Misc.IOBox.Input8.DwellTime=5
+Misc.IOBox.Input8.PresetNo=8
+Misc.IOBox.Input8.Active=N.C.
+Misc.IOBox.Input9.Enable=OFF
+Misc.IOBox.Input9.AutoTracking=OFF
+Misc.IOBox.Input9.DwellTime=5
+Misc.IOBox.Input9.PresetNo=9
+Misc.IOBox.Input9.Active=N.C.
+Misc.IOBox.Input10.Enable=OFF
+Misc.IOBox.Input10.AutoTracking=OFF
+Misc.IOBox.Input10.DwellTime=5
+Misc.IOBox.Input10.PresetNo=10
+Misc.IOBox.Input10.Active=N.C.
+Misc.IOBox.Input11.Enable=OFF
+Misc.IOBox.Input11.AutoTracking=OFF
+Misc.IOBox.Input11.DwellTime=5
+Misc.IOBox.Input11.PresetNo=11
+Misc.IOBox.Input11.Active=N.C.
+Misc.IOBox.Input12.Enable=OFF
+Misc.IOBox.Input12.AutoTracking=OFF
+Misc.IOBox.Input12.DwellTime=5
+Misc.IOBox.Input12.PresetNo=12
+Misc.IOBox.Input12.Active=N.C.
+Misc.IOBox.Input13.Enable=OFF
+Misc.IOBox.Input13.AutoTracking=OFF
+Misc.IOBox.Input13.DwellTime=5
+Misc.IOBox.Input13.PresetNo=13
+Misc.IOBox.Input13.Active=N.C.
+Misc.IOBox.Input14.Enable=OFF
+Misc.IOBox.Input14.AutoTracking=OFF
+Misc.IOBox.Input14.DwellTime=5
+Misc.IOBox.Input14.PresetNo=14
+Misc.IOBox.Input14.Active=N.C.
+Misc.IOBox.Input15.Enable=OFF
+Misc.IOBox.Input15.AutoTracking=OFF
+Misc.IOBox.Input15.DwellTime=5
+Misc.IOBox.Input15.PresetNo=15
+Misc.IOBox.Input15.Active=N.C.
+Misc.IOBox.Input16.Enable=OFF
+Misc.IOBox.Input16.AutoTracking=OFF
+Misc.IOBox.Input16.DwellTime=5
+Misc.IOBox.Input16.PresetNo=16
+Misc.IOBox.Input16.Active=N.C.
+Misc.IOBox.Output1.Enable=OFF
+Misc.IOBox.Output1.TriggerInput=0
+Misc.IOBox.Output1.Active=LOW
+GPS.Location=25.040076746689472,121.51211500167846
+GPS.Zoom=1
+GPS.GMapKey=ABQIAAAAm_S5faxhNvbQCPHzsJNBVxRfWanLLCphprUHhM3Ro32oaDF9qBTNLjWf0DY1IXIjA3zgEPBqfBgNhQ
+
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 29
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525584; IdleTime=15
+
+action=get&category=General.*
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:44:05 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 158
+
+0
+OK
+General.TurboStep=0
+General.Language=ENGLISH
+General.Maxlog=300
+General.DeviceTitle=IPCAM
+General.DefaultLanguage=ENGLISH
+General.StatusLed.Usage=ENABLE
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 31
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525584; IdleTime=15
+
+action=get&category=Misc.Time.*
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:44:08 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 30
+
+0
+OK
+Misc.Time.OSD.Enable=OFF
+
+
+
+===========================================================================================================================================
+POST /cgi-bin/guest/Time.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 10
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525584; IdleTime=15
+
+action=get
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:44:08 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 29
+
+0
+OK
+2013/01/30 Wed 15:44:08
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 26
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525584; IdleTime=15
+
+action=get&category=Misc.*
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:44:09 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 3679
+
+0
+OK
+Misc.Time.OSD.Enable=OFF
+Misc.DaylightSaving.Enable=OFF
+Misc.DaylightSaving.DaylightStart=07-01-0 6:00
+Misc.DaylightSaving.DaylightEnd=09-01-4 10:00
+Misc.DaylightSaving.AdjustTime=1:00
+Misc.Wizard.Auto=YES
+Misc.External.DI.Port1.Channel=1;
+Misc.External.DI.Port1.Active=N.O.
+Misc.External.DO.Port1.Channel=1;
+Misc.External.DO.Port1.Trigger=NONE
+Misc.External.DO.Port1.Active=LOW
+Misc.External.DO.Manual.Duration=20
+Misc.IOControl.Number=7
+Misc.IOControl.IO1.Title=IO-1
+Misc.IOControl.IO1.Switch=OFF
+Misc.IOControl.IO1.Baudrate=9600
+Misc.IOControl.IO2.Title=IO-2
+Misc.IOControl.IO2.Switch=OFF
+Misc.IOControl.IO2.Baudrate=9600
+Misc.IOControl.IO3.Title=IO-3
+Misc.IOControl.IO3.Switch=OFF
+Misc.IOControl.IO3.Baudrate=9600
+Misc.IOControl.IO4.Title=IO-4
+Misc.IOControl.IO4.Switch=OFF
+Misc.IOControl.IO4.Baudrate=9600
+Misc.IOControl.IO5.Title=IO-5
+Misc.IOControl.IO5.Switch=OFF
+Misc.IOControl.IO5.Baudrate=9600
+Misc.IOControl.IO6.Title=IO-6
+Misc.IOControl.IO6.Switch=OFF
+Misc.IOControl.IO6.Baudrate=9600
+Misc.IOControl.IO7.Title=IO-7
+Misc.IOControl.IO7.Switch=OFF
+Misc.IOControl.IO7.Baudrate=9600
+Misc.IOBox.Input1.Enable=OFF
+Misc.IOBox.Input1.AutoTracking=OFF
+Misc.IOBox.Input1.DwellTime=5
+Misc.IOBox.Input1.PresetNo=1
+Misc.IOBox.Input1.Active=N.C.
+Misc.IOBox.Input2.Enable=OFF
+Misc.IOBox.Input2.AutoTracking=OFF
+Misc.IOBox.Input2.DwellTime=5
+Misc.IOBox.Input2.PresetNo=2
+Misc.IOBox.Input2.Active=N.C.
+Misc.IOBox.Input3.Enable=OFF
+Misc.IOBox.Input3.AutoTracking=OFF
+Misc.IOBox.Input3.DwellTime=5
+Misc.IOBox.Input3.PresetNo=3
+Misc.IOBox.Input3.Active=N.C.
+Misc.IOBox.Input4.Enable=OFF
+Misc.IOBox.Input4.AutoTracking=OFF
+Misc.IOBox.Input4.DwellTime=5
+Misc.IOBox.Input4.PresetNo=4
+Misc.IOBox.Input4.Active=N.C.
+Misc.IOBox.Input5.Enable=OFF
+Misc.IOBox.Input5.AutoTracking=OFF
+Misc.IOBox.Input5.DwellTime=5
+Misc.IOBox.Input5.PresetNo=5
+Misc.IOBox.Input5.Active=N.C.
+Misc.IOBox.Input6.Enable=OFF
+Misc.IOBox.Input6.AutoTracking=OFF
+Misc.IOBox.Input6.DwellTime=5
+Misc.IOBox.Input6.PresetNo=6
+Misc.IOBox.Input6.Active=N.C.
+Misc.IOBox.Input7.Enable=OFF
+Misc.IOBox.Input7.AutoTracking=OFF
+Misc.IOBox.Input7.DwellTime=5
+Misc.IOBox.Input7.PresetNo=7
+Misc.IOBox.Input7.Active=N.C.
+Misc.IOBox.Input8.Enable=OFF
+Misc.IOBox.Input8.AutoTracking=OFF
+Misc.IOBox.Input8.DwellTime=5
+Misc.IOBox.Input8.PresetNo=8
+Misc.IOBox.Input8.Active=N.C.
+Misc.IOBox.Input9.Enable=OFF
+Misc.IOBox.Input9.AutoTracking=OFF
+Misc.IOBox.Input9.DwellTime=5
+Misc.IOBox.Input9.PresetNo=9
+Misc.IOBox.Input9.Active=N.C.
+Misc.IOBox.Input10.Enable=OFF
+Misc.IOBox.Input10.AutoTracking=OFF
+Misc.IOBox.Input10.DwellTime=5
+Misc.IOBox.Input10.PresetNo=10
+Misc.IOBox.Input10.Active=N.C.
+Misc.IOBox.Input11.Enable=OFF
+Misc.IOBox.Input11.AutoTracking=OFF
+Misc.IOBox.Input11.DwellTime=5
+Misc.IOBox.Input11.PresetNo=11
+Misc.IOBox.Input11.Active=N.C.
+Misc.IOBox.Input12.Enable=OFF
+Misc.IOBox.Input12.AutoTracking=OFF
+Misc.IOBox.Input12.DwellTime=5
+Misc.IOBox.Input12.PresetNo=12
+Misc.IOBox.Input12.Active=N.C.
+Misc.IOBox.Input13.Enable=OFF
+Misc.IOBox.Input13.AutoTracking=OFF
+Misc.IOBox.Input13.DwellTime=5
+Misc.IOBox.Input13.PresetNo=13
+Misc.IOBox.Input13.Active=N.C.
+Misc.IOBox.Input14.Enable=OFF
+Misc.IOBox.Input14.AutoTracking=OFF
+Misc.IOBox.Input14.DwellTime=5
+Misc.IOBox.Input14.PresetNo=14
+Misc.IOBox.Input14.Active=N.C.
+Misc.IOBox.Input15.Enable=OFF
+Misc.IOBox.Input15.AutoTracking=OFF
+Misc.IOBox.Input15.DwellTime=5
+Misc.IOBox.Input15.PresetNo=15
+Misc.IOBox.Input15.Active=N.C.
+Misc.IOBox.Input16.Enable=OFF
+Misc.IOBox.Input16.AutoTracking=OFF
+Misc.IOBox.Input16.DwellTime=5
+Misc.IOBox.Input16.PresetNo=16
+Misc.IOBox.Input16.Active=N.C.
+Misc.IOBox.Output1.Enable=OFF
+Misc.IOBox.Output1.TriggerInput=0
+Misc.IOBox.Output1.Active=LOW
+
+
+
+===========================================================================================================================================
+POST /cgi-bin/supervisor/Log.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 66
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525584; IdleTime=15
+
+action=query&type=event_log&command=latest&log_type=ALL&log_num=20
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.1 200 OK
+Date: Wed, 30 Jan 2013 15:44:11 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Transfer-Encoding: chunked
+
+5
+0
+OK
+
+27b
+5 0 2013/01/30 15:43:03 0 NULL
+19 0 2013/01/30 15:42:52 0 NULL
+9 0 2013/01/30 08:53:34 1 admin
+9 0 2013/01/29 18:33:18 1 admin
+9 0 2013/01/29 18:32:08 1 admin
+9 0 2013/01/29 18:29:43 1 admin
+15 0 2013/01/29 18:29:25 1 NULL
+15 0 2013/01/29 18:28:24 0 NULL
+1 0 2012/01/02 08:52:43 1 NULL
+15 0 2012/01/01 00:01:02 0 NULL
+19 0 2012/01/01 00:00:55 0 NULL
+1 0 2012/01/01 00:00:14 1 NULL
+15 0 2012/01/01 00:01:02 0 NULL
+19 0 2012/01/01 00:00:55 0 NULL
+1 0 2012/01/01 00:00:14 1 NULL
+15 0 2012/01/01 00:01:02 0 NULL
+19 0 2012/01/01 00:00:55 0 NULL
+1 0 2012/01/01 00:00:14 1 NULL
+15 0 2012/01/01 00:01:02 0 NULL
+19 0 2012/01/01 00:00:55 0 NULL
+
+0
+
+
+
+
+===========================================================================================================================================
+POST /cgi-bin/supervisor/PwdGrp.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 31
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525584; IdleTime=15
+
+action=get&param=AnonymousLogin
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:44:15 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 28
+
+0
+OK
+AnonymousLogin=DISABLE
+
+
+===========================================================================================================================================
+POST /cgi-bin/user/Config.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 34
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525584; IdleTime=15
+
+action=get&category=Network.HTML.*
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:44:15 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 89
+
+0
+OK
+Network.HTML.Index=nobody/login.htm
+Network.HTML.Timeout=15
+Network.HTML.Config=YES
+
+
+===========================================================================================================================================
+POST /cgi-bin/supervisor/PwdGrp.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 25
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525584; IdleTime=15
+
+action=get&param=max_user
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:44:15 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 17
+
+0
+OK
+max_user=10
+
+
+
+===========================================================================================================================================
+POST /cgi-bin/guest/UserInfo.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 14
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525584; IdleTime=15
+
+action=checkip
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:44:15 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 25
+
+0
+OK
+192.168.0.161:25306
+
+
+
+===========================================================================================================================================
+POST /cgi-bin/guest/UserInfo.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 10
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525584; IdleTime=15
+
+action=get
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:44:15 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 21
+
+0
+OK
+Online-Number=0
+
+
+
+===========================================================================================================================================
+POST /cgi-bin/supervisor/PwdGrp.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 11
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525584; IdleTime=15
+
+action=list
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:44:20 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 52
+
+0
+OK
+admin.Level=SUPERVISOR
+admin.Lifetime=INFINITE
+
+
+===========================================================================================================================================
+POST /cgi-bin/supervisor/Firmware.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 30
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525584; IdleTime=15
+
+action=get&information=version
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:44:23 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Content-Length: 42
+
+0
+OK
+Firmware-Version=1035-1024-1025-1008
+
+
+===========================================================================================================================================
+POST /cgi-bin/guest/Login.cgi HTTP/1.1
+Host: 192.168.0.158:88
+Connection: keep-alive
+Content-Length: 39
+Origin: http://192.168.0.158:88
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Referer: http://192.168.0.158:88/index.htm
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
+Cookie: pbAudioFalg=ON; MEDIA TYPE=H264; captcha=CM.TsbeIQ/VTQ; x=1; SSID=YWRtaW46YWRtaW4=; RESOLUTION=720P; ReloWebTime=0; LifeTime=525583; IdleTime=15
+
+action=clear_SSID&host=192.168.0.158:88
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+HTTP/1.0 200 OK
+Date: Wed, 30 Jan 2013 15:44:40 GMT
+nServer: Linux/2.x UPnP/1.0 Avtech/1.0
+Expires: 0
+Pragma: no-cache
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/plain
+Set-Cookie: captcha=EXPIRED;Domain=192.168.0.158:88;Path=/;Expires=Mon,01-Jan-1990 00:00:00 GMT
+Set-Cookie: SSID=EXPIRED;Domain=192.168.0.158:88;Path=/;Expires=Mon,01-Jan-1990 00:00:00 GMT
+Set-Cookie: x=EXPIRED;Domain=192.168.0.158:88;Path=/;Expires=Mon,01-Jan-1990 00:00:00 GMT
+Content-Length: 5
+
+0
+OK
+
+
+

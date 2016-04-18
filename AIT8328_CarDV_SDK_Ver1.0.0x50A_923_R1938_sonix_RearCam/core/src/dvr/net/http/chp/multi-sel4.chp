@@ -1,0 +1,76 @@
+<?csub
+//----------------------------------------------------------------------------------------------------------------
+// BEGIN of CHP Subroutines: these codes must be placed at the very beginning of a CHP code !!!
+//----------------------------------------------------------------------------------------------------------------
+
+// the list of values and labels for the checkboxes
+char *personality_attributes_value[] = { "perky", "morose", "thinking", "feeling", "thrifty", "prodigal" };
+char *personality_attributes_label[] = { "Perky", "Morose", "Thinking", "Feeling", "Spend-thrift", "Shopper" };
+
+// this function will be called before XXX__WEB_READ()
+int CHP_GETINFO()
+{
+	char buf[12];
+	static int __i__ = 0;
+
+	sprintf( buf, "%d", __i__++ );
+	CHP_SET_COOKIE( "TestVar1", "This is a book", -1 );
+	CHP_SET_COOKIE( "TestVar2", buf, -1 );
+	CHP_SET_COOKIE( "TestVar3", __DATE__ __TIME__, -1 );
+
+	// return VHAND_OK__AUTHENTICATOR;  // when this is a user-login CHP
+	return VHAND_OK__NO_CHECK_AUTH;     // normal case
+}
+
+// create HTML for identically-named checkboxes
+// in CHP, we can't define function within another function ==> Use #define macro as a replace
+void make_checkboxes(char *name)
+{
+	int i;
+	for (i=0; i<6; i++) {
+		CHP_PRINTF("%s <input type='checkbox' name='%s[]' value='%s' ",
+				personality_attributes_label[i], name, personality_attributes_value[i]);
+		if ( CHP_IN_ARRAY( personality_attributes_value[i], "attributes[]" ) ) CHP_PRINTF("checked ");
+		CHP_PRINTF("/><br />\n");
+	}
+}
+
+//----------------------------------------------------------------------------------------------------------------
+// END of CHP Subroutines
+//----------------------------------------------------------------------------------------------------------------
+?>
+
+<html>
+<head><title>Personality</title></head>
+<body>
+
+<p>
+<?chp CHP_PRINTF("Cookie TestVar1 = %s", CHP_COOKIE_VARS("TestVar1")); ?>  </br>
+<?chp CHP_PRINTF("Cookie TestVar2 = %s", CHP_COOKIE_VARS("TestVar2")); ?>  </br>
+<?chp CHP_PRINTF("Cookie TestVar3 = %s", CHP_COOKIE_VARS("TestVar3")); ?>  </br>
+</p>
+
+<form action="<?chp CHP_PRINTF("%s", CHP_SERVER_SELF); ?>" method="GET">
+Select your personality attributes:<br />
+<?chp make_checkboxes(CSUB, "attributes"); ?>
+<br />
+<input type="submit" name="s" value="Record my personality!" />
+</form>
+
+<?chp
+	if (CHP_GET_VARS("s") != NULL) {
+		int  i;
+		char *str;
+
+		CHP_PRINTF("You have a ");
+		for (i=0; i<100; i++) {
+			str = CHP_GET_ARRAYS("attributes[]",i);
+			if (!str) break;
+			CHP_PRINTF("%s ", str);
+		}
+		CHP_PRINTF("personality.");
+	}
+?>
+
+</body>
+</html>

@@ -1,0 +1,137 @@
+<?chp
+	char *streaming_type = CHP_GET_VARS("type");
+	if (!streaming_type)   streaming_type = "HELP";
+?>
+
+<!-- =================================================================================== -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!-- =================================================================================== -->
+  <head>
+    <title>MJPG-streamer</title>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <link rel="stylesheet" href="style.css" type="text/css" />
+    <!--[if IE 6]>
+    <link rel="stylesheet" href="fix.css" type="text/css" />
+    <![endif]-->
+    <script type="text/javascript">
+
+      /* Copyright (C) 2007 Richard Atterer, richard�atterer.net
+       * This program is free software; you can redistribute it and/or modify it
+       * under the terms of the GNU General Public License, version 2. See the file
+       * COPYING for details.
+       */
+
+      var imageNr = 0; // Serial number of current image
+      var finished = new Array(); // References to img objects which have finished downloading
+      var paused = false;
+      var previous_time = new Date();
+
+      function createImageLayer() {
+        var img = new Image();
+        img.style.position = "absolute";
+        img.style.zIndex = -1;
+        img.onload = imageOnload;
+        img.onclick = imageOnclick;
+        // img.width = 320;
+        // img.height = 240;
+        img.src = "staticMJPEG";
+        var webcam = document.getElementById("webcam");
+        webcam.insertBefore(img, webcam.firstChild);
+      }
+
+      // Two layers are always present (except at the very beginning), to avoid flicker
+      function imageOnload() {
+        this.style.zIndex = imageNr; // Image finished, bring to front!
+        while (1 < finished.length) {
+          var del = finished.shift(); // Delete old image(s) from document
+          del.parentNode.removeChild(del);
+        }
+        finished.push(this);
+        current_time = new Date();
+        delta = current_time.getTime() - previous_time.getTime();
+        fps   = (1000.0 / delta).toFixed(3);
+        document.getElementById('info').firstChild.nodeValue = delta + " ms (" + fps + " fps)";
+        previous_time = current_time;
+        if (!paused) createImageLayer();
+      }
+
+      function imageOnclick() { // Clicking on the image will pause the stream
+        paused = !paused;
+        if (!paused) createImageLayer();
+      }
+
+    </script>
+  </head>
+<!-- =================================================================================== -->
+
+
+<?chp
+	//--------------------------------------------------------------------------------------
+	if (!strcasecmp(streaming_type, "live")) {
+?>
+		<body>
+		    <div>
+		      <img src="/cgi-bin/liveMJPEG" />
+		    </div>
+		</body></html>
+<?chp
+	}
+	//--------------------------------------------------------------------------------------
+	else if (!strcasecmp(streaming_type, "static")) {
+?>
+		<body onload="createImageLayer();">
+			<div id="info" style="display:none; visibility:hidden;">-</div>
+			<div id="content">
+				<div id="webcam"><noscript>
+					<img src="/cgi-bin/staticMJPEG"/></noscript>
+				</div>
+			</div>
+		</body> </html>
+<?chp
+	}
+	//--------------------------------------------------------------------------------------
+	else if (!strcasecmp(streaming_type, "static2")) {
+?>
+		<body onload="createImageLayer();">
+			<div id="sidebar">
+				<h3>Version info:</h3>
+				<p>v0.1 (Aug 27, 2013)</p>
+
+				<h3>Runtime info:</h3>
+				<p id="info">-</p>
+			</div>
+
+			<div id="content">
+				<div id="webcam" style="width:320px;height:240px"><noscript>
+					<img src="/cgi-bin/staticMJPEG" width="320px" height="240px" /></noscript>
+				</div>
+			</div>
+		</body> </html>
+<?chp
+	}
+	//--------------------------------------------------------------------------------------
+	else {
+?>
+		<body>
+			<p>Oh Oh, you can specify one of the below URLs: <br/>
+				&nbsp;&nbsp;&nbsp;&nbsp; Push mode MJPEG Streaming :
+					<a href="http://<?chp CHP_PRINTF("%s",CHP_HTTP_HEAD("Host")); ?>/cgi-bin/stream.cgi?type=live">
+					         http://<?chp CHP_PRINTF("%s",CHP_HTTP_HEAD("Host")); ?>/cgi-bin/stream.cgi?type=live
+					</a><br/>
+				&nbsp;&nbsp;&nbsp;&nbsp; Pull mode MJPEG Streaming, plain video :
+					<a href="http://<?chp CHP_PRINTF("%s",CHP_HTTP_HEAD("Host")); ?>/cgi-bin/stream.cgi?type=static">
+					         http://<?chp CHP_PRINTF("%s",CHP_HTTP_HEAD("Host")); ?>/cgi-bin/stream.cgi?type=static
+					</a><br/>
+				&nbsp;&nbsp;&nbsp;&nbsp; Pull mode MJPEG Streaming, with FPS info :
+					<a href="http://<?chp CHP_PRINTF("%s",CHP_HTTP_HEAD("Host")); ?>/cgi-bin/stream.cgi?type=static2">
+					         http://<?chp CHP_PRINTF("%s",CHP_HTTP_HEAD("Host")); ?>/cgi-bin/stream.cgi?type=static2
+					</a><br/>
+			</p>
+		</body></html>
+<?chp
+	}
+?>
+
+

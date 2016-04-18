@@ -1,0 +1,35 @@
+<html>
+<head><title>Personality</title></head>
+<body>
+  
+<form action="<?chp CHP_PRINTF("%s", CHP_SERVER_SELF); ?>" method="GET">
+Select your personality attributes:<br />
+<select name="attributes[]" multiple>
+<option value="perky">Perky</option>
+<option value="morose">Morose</option>
+<option value="thinking">Thinking</option>
+<option value="feeling">Feeling</option>
+<option value="thrifty">Spend-thrift</option>
+<option value="prodigal">Shopper</option>
+</select>
+<br>
+<input type="submit" name="s" value="Record my personality!" />
+</form>
+  
+<?chp
+	if (CHP_GET_VARS("s") != NULL) {
+		int  i;
+		char *str;
+
+		CHP_PRINTF("You have a ");
+		for (i=0; i<100; i++) {
+			str = CHP_GET_ARRAYS("attributes[]",i);
+			if (!str) break;
+			CHP_PRINTF("%s ", str);
+		}
+		CHP_PRINTF("personality.");
+	}
+?>
+  
+</body>
+</html>
